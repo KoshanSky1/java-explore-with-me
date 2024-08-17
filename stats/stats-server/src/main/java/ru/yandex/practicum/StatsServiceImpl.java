@@ -19,15 +19,18 @@ public class StatsServiceImpl implements StatsService {
     @Override
     public EndpointHit postStats(EndpointHit endpointHit) {
         log.info(format("Записан новый элемент статистики: %s", endpointHit));
-        return repository.save(endpointHit);
+        //return repository.save(endpointHit);
+        return null;
     }
 
     @Override
     public List<VievStats> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         if (unique) {
-            return repository.getUniqueStat(start, end, uris);
+            //return repository.getUniqueStat(start, end, uris);
+            return null;
         } else {
-            return repository.getStat(start, end, uris);
+            return null;
+            //return repository.getStat(start, end, uris);
         }
     }
 }

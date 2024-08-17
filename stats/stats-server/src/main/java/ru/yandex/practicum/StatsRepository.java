@@ -8,17 +8,19 @@ import java.util.List;
 
 
 public interface StatsRepository extends JpaRepository<EndpointHit, Long> {
-    @Query("select h " +
-            "from Hit as h " +
+    /*@Query("select h " +
+            "from hits as h " +
             "where h.created beetwen ?1 and ?2 " +
             "and h. uri in ?3 " +
             "group by h.app, h.uri")
+
     List<VievStats> getStat(LocalDateTime start, LocalDateTime end, List<String> uris);
 
     @Query("select h " +
-            "from Hit as h " +
+            "from hits as h " +
             "where h.created beetwen ?1 and ?2 " +
             "and h. uri in ?3 " +
             "group by h.app, h.uri")
     List<VievStats> getUniqueStat(LocalDateTime start, LocalDateTime end, List<String> uris);
+    */
 }
