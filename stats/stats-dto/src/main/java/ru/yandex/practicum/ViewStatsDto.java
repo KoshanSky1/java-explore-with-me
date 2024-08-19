@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class VievStats {
+public class ViewStatsDto {
     private String app;
     private String uri;
     private Integer hits;

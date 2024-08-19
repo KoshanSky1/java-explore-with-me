@@ -8,16 +8,17 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.util.DefaultUriBuilderFactory;
-import ru.yandex.practicum.EndpointHit;
+import ru.yandex.practicum.EndpointHitDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class StatsClient extends BaseClient {
 
     @Autowired
-    public StatsClient(@Value("${explore-with-me-server.url}") String serverUrl, RestTemplateBuilder builder) {
+    public StatsClient(@Value("${stats-service.url}") String serverUrl, RestTemplateBuilder builder) {
         super(
                 builder
                         .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
@@ -26,13 +27,18 @@ public class StatsClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> postStats(EndpointHit endpointHit) {
-        return post("/hit", endpointHit);
+    public ResponseEntity<Object> postStats(EndpointHitDto endpointHitDto) {
+        return post("/hit", endpointHitDto);
     }
 
     @GetMapping
     public ResponseEntity<Object> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
-        return get("/stats", start, end, uris, unique);
+        Map<String, Object> parameters = Map.of(
+                "start", start,
+                "uris", uris,
+                "unique", unique
+        );
+        return get("/stats?start={start}&end={end}&uris={uris}&unique={unique}", parameters);
     }
 
 }
