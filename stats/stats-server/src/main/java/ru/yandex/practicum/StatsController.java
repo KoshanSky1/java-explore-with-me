@@ -22,7 +22,7 @@ public class StatsController {
 
     @PostMapping("/hit")
     public ResponseEntity<EndpointHitDto> postStat(@RequestBody EndpointHitDto endpointHitDto) {
-        log.info("---START POST STAT ENDPOINT---");
+        log.info("---START POST STAT ELEMENT ENDPOINT---");
         return new ResponseEntity<>(statsService.postStats(toEndpointHit(endpointHitDto)), HttpStatus.CREATED);
 
     }
