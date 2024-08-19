@@ -1,11 +1,14 @@
-package ru.yandex.practicum;
+package ru.yandex.practicum.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.EndpointHitDto;
+import ru.yandex.practicum.StatsRepository;
 import ru.yandex.practicum.exception.StatsValidationException;
 import ru.yandex.practicum.model.EndpointHit;
 import ru.yandex.practicum.model.ViewStats;
+import ru.yandex.practicum.service.StatsService;
 
 import java.time.LocalDateTime;
 import java.util.*;

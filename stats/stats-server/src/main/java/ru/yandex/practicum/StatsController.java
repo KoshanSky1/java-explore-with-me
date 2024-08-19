@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.model.ViewStats;
+import ru.yandex.practicum.service.StatsService;
 
 import java.time.LocalDateTime;
 import java.util.List;

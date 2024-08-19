@@ -1,5 +1,6 @@
-package ru.yandex.practicum;
+package ru.yandex.practicum.service;
 
+import ru.yandex.practicum.EndpointHitDto;
 import ru.yandex.practicum.model.EndpointHit;
 import ru.yandex.practicum.model.ViewStats;
 
