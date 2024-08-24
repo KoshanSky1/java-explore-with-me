@@ -26,7 +26,6 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
 
     @Override
     public Category updateCategoryById(long catId, CategoryDto categoryDto) {
-        //Optional<Category> category = repository.findById(catId);
         return repository.save(toCategory(categoryDto));
     }
 }
