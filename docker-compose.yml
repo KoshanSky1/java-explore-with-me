@@ -29,7 +29,7 @@ services:
     depends_on:
       - ewm-db
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://evm-db:5432/evm-db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ewm-db
 
   ewm-db:
     image: postgres:16.3-alpine
@@ -39,6 +39,6 @@ services:
     volumes:
       - ./database:/docker-entrypoint-initdb.d
     environment:
-      - POSTGRES_DB=evm-db
+      - POSTGRES_DB=ewm-db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=root

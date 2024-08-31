@@ -1,10 +1,11 @@
 package ru.yandex.practicum.compilation;
 
 import jakarta.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.yandex.practicum.compilation.dto.EventShortDto;
+import ru.yandex.practicum.admin.event.Event;
 
 import java.util.List;
 
@@ -21,5 +22,9 @@ public class Compilation {
     private String title;
     @Column(name = "pinned")
     private Boolean pinned;
-    List<EventShortDto> events;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "events_compilations",
+            joinColumns = @JoinColumn(name = "compilation_id"),
+            inverseJoinColumns = @JoinColumn(name = "event_id"))
+    List<Event> events;
 }
