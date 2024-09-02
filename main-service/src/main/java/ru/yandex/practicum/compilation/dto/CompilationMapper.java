@@ -19,7 +19,7 @@ public class CompilationMapper {
         return new CompilationDto(
                 compilation.getId(),
                 compilation.getTitle(),
-                compilation.getPinned(),
+                compilation.isPinned(),
                 toListEventShortDto(compilation.getEvents())
         );
     }
@@ -29,7 +29,7 @@ public class CompilationMapper {
         return new Compilation(
                 null,
                 newCompilationDto.getTitle(),
-                newCompilationDto.getPinned(),
+                newCompilationDto.isPinned(),
                 events
         );
     }

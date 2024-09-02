@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.admin.category.Category;
 import ru.yandex.practicum.admin.users.User;
 import ru.yandex.practicum.event.EventFullDto;
-import ru.yandex.practicum.event.EventRequestStatusUpdateRequest;
 import ru.yandex.practicum.event.EventShortDto;
 import ru.yandex.practicum.event.UpdateEventUserRequest;
 
@@ -23,35 +22,35 @@ public class EventMapper {
 
     public static EventShortDto toEventShortDto(Event event) {
         return new EventShortDto(
-            event.getId(),
-            event.getAnnotation(),
-            toCategoryDto(event.getCategory()),
-            null,
-            event.getEventDate(),
-            toUserShortDto(event.getInitiator()),
-            event.getPaid(),
-            event.getTitle(),
-            event.getViews()
+                event.getId(),
+                event.getAnnotation(),
+                toCategoryDto(event.getCategory()),
+                null,
+                event.getEventDate(),
+                toUserShortDto(event.getInitiator()),
+                event.getPaid(),
+                event.getTitle(),
+                event.getViews()
         );
     }
 
     public static Event toEventFromNewEventDto(NewEventDto newEventDto, Category category, User initiator) {
         return new Event(
-            null,
-            newEventDto.getAnnotation(),
-            category,
-            LocalDateTime.now(),
-            newEventDto.getDescription(),
-            newEventDto.getEventDate(),
-            initiator,
-            newEventDto.getLocation(),
-            newEventDto.getPaid(),
-            newEventDto.getParticipantLimit(),
-            LocalDateTime.now(),
-            newEventDto.getRequestModeration(),
-            null,
-            newEventDto.getTitle(),
-            null
+                null,
+                newEventDto.getAnnotation(),
+                category,
+                LocalDateTime.now(),
+                newEventDto.getDescription(),
+                newEventDto.getEventDate(),
+                initiator,
+                newEventDto.getLocation(),
+                newEventDto.getPaid(),
+                newEventDto.getParticipantLimit(),
+                LocalDateTime.now(),
+                newEventDto.getRequestModeration(),
+                null,
+                newEventDto.getTitle(),
+                null
         );
     }
 

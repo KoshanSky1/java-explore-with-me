@@ -13,19 +13,15 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateEventAdminRequest {
-    //private Long id;
     private String annotation;
     private Integer category;
     private String description;
-   // private Integer confirmedRequests;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
     private Location location;
-    //private UserShortDto user;
     private Boolean paid;
-    private Boolean participantLimit;
+    private Integer participantLimit;
     private Boolean requestModeration;
     private EventStateAction stateAction;
     private String title;
-    //private Integer views;
 }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.admin.category.Category;
+import ru.yandex.practicum.admin.category.CategoryRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,7 +13,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Service
 public class PublicCategoriesServiceImpl implements PublicCategoriesService {
-    PublicCategoriesRepository publicCategoriesRepository;
+    CategoryRepository publicCategoriesRepository;
 
     @Override
     public List<Category> getCategories() {

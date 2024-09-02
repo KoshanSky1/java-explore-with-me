@@ -21,10 +21,8 @@ public class Compilation {
     @Column(name = "title")
     private String title;
     @Column(name = "pinned")
-    private Boolean pinned;
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "events_compilations",
-            joinColumns = @JoinColumn(name = "compilation_id"),
-            inverseJoinColumns = @JoinColumn(name = "event_id"))
+    private boolean pinned;
+    @ElementCollection
+   // @JoinColumn(name = "event_id")
     List<Event> events;
 }

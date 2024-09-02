@@ -9,6 +9,7 @@ import ru.yandex.practicum.admin.event.Event;
 import ru.yandex.practicum.admin.event.UpdateEventAdminRequest;
 import ru.yandex.practicum.event.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -23,11 +24,11 @@ public class AdminEventsController {
     private final AdminEventsService service;
 
     @GetMapping
-    public ResponseEntity<List<EventFullDto>> getEvents(@RequestParam int[] users,
-                                                        @RequestParam String[] states,
-                                                        @RequestParam int[] categories,
-                                                        @RequestParam String rangeStart,
-                                                        @RequestParam String rangeEnd,
+    public ResponseEntity<List<EventFullDto>> getEvents(@RequestParam(required = false) List<Long> users,
+                                                        @RequestParam(required = false) List<String> states,
+                                                        @RequestParam(required = false) List<Long> categories,
+                                                        @RequestParam(required = false) LocalDateTime rangeStart,
+                                                        @RequestParam(required = false) LocalDateTime rangeEnd,
                                                         @RequestParam(defaultValue = "0") int from,
                                                         @RequestParam(defaultValue = "10") int size) {
         log.info("---START GET EVENTS ENDPOINT---");

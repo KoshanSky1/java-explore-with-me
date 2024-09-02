@@ -10,6 +10,7 @@ import ru.yandex.practicum.admin.event.NewEventDto;
 import ru.yandex.practicum.event.*;
 import ru.yandex.practicum.request.Request;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,7 +36,8 @@ public class PrivateEventsController {
     }
 
     @PostMapping
-    public ResponseEntity<EventFullDto> addEvent(@PathVariable int userId, @RequestBody NewEventDto newEventDto) {
+    public ResponseEntity<EventFullDto> addEvent(@PathVariable int userId,
+                                                 @RequestBody @Valid NewEventDto newEventDto) {
         log.info("---START ADD EVENT ENDPOINT---");
         return new ResponseEntity<>(toEventFullDto(service.addEvent(userId, newEventDto)), HttpStatus.OK);
     }

@@ -19,7 +19,7 @@ public class UpdateEventUserRequest {
     private LocalDateTime eventDate;
     private Location location;
     private Boolean paid;
-    private Boolean participantLimit;
+    private Integer participantLimit;
     private Boolean requestModeration;
     private EventStateAction stateAction;
     private String title;

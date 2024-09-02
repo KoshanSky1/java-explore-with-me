@@ -4,11 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.admin.category.Category;
-import ru.yandex.practicum.admin.category.admin.AdminCategoryRepository;
+import ru.yandex.practicum.admin.category.CategoryRepository;
 import ru.yandex.practicum.admin.event.Event;
 import ru.yandex.practicum.admin.event.NewEventDto;
 import ru.yandex.practicum.admin.users.admin.AdminUserRepository;
 import ru.yandex.practicum.admin.users.User;
+import ru.yandex.practicum.error.IncorrectParameterException;
 import ru.yandex.practicum.event.*;
 import ru.yandex.practicum.request.Request;
 import ru.yandex.practicum.request.RequestRepository;
@@ -25,7 +26,7 @@ import static ru.yandex.practicum.admin.event.EventMapper.*;
 public class PrivateEventsServiceImpl implements PrivateEventsService {
     private final PrivateEventsRepository eventsRepository;
     private final AdminUserRepository userRepository;
-    private final AdminCategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
     private final RequestRepository requestRepository;
 
     @Override
@@ -35,6 +36,12 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
 
     @Override
     public Event addEvent(int userId, NewEventDto newEventDto) {
+        //if (0 >= newEventDto.getParticipantLimit() || newEventDto.getDescription().isEmpty()
+        //        || newEventDto.getDescription() == null || newEventDto.getDescription().isBlank()
+         //       || newEventDto.getAnnotation().isEmpty() || newEventDto.getAnnotation().isBlank()
+        //        || newEventDto.getAnnotation() == null) {
+        //    throw new IncorrectParameterException();
+        //}
         Category category = categoryRepository.findById(Long.valueOf(newEventDto.getCategoryId())).orElseThrow();
         User user = userRepository.findById((long) userId).orElseThrow();
         return eventsRepository.save(toEventFromNewEventDto(newEventDto, category, user));
@@ -70,6 +77,5 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
         }
         return requestsUpdated;
     }
-
 
 }

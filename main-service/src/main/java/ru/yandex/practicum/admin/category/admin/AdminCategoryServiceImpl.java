@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.admin.category.Category;
+import ru.yandex.practicum.admin.category.CategoryRepository;
 import ru.yandex.practicum.admin.category.dto.CategoryDto;
 import ru.yandex.practicum.admin.category.dto.NewCategoryDto;
 
@@ -14,7 +15,7 @@ import static ru.yandex.practicum.admin.category.dto.CategoryMapper.toCategoryFr
 @RequiredArgsConstructor
 @Service
 public class AdminCategoryServiceImpl implements AdminCategoryService {
-    private final AdminCategoryRepository repository;
+    private final CategoryRepository repository;
 
     @Override
     public Category addCategory(NewCategoryDto newCategoryDto) {

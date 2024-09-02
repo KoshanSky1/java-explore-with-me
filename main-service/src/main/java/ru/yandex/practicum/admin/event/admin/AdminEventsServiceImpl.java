@@ -21,25 +21,25 @@ public class AdminEventsServiceImpl implements AdminEventsService {
     AdminEventsRepository eventsRepository;
 
     @Override
-    public List<Event> getEvents(int[] users, String[] states, int[] categories, String rangeStart,
-                                 String rangeEnd) {
+    public List<Event> getEvents(List<Long> users, List<String> states, List<Long> categories, LocalDateTime rangeStart,
+                                 LocalDateTime rangeEnd) {
 
-        List<Long> usersIds = new ArrayList<>();
-        List<EventState> eventStates = findByState(states);
-        List<Long> categoryList = new ArrayList<>();
+       // List<Long> usersIds = new ArrayList<>();
+          List<EventState> eventStates = findByState(states);
+      //  List<Long> categoryList = new ArrayList<>();
 
-        for (Integer i : users) {
-            usersIds.add((long) i);
-        }
-        for (Integer c : categories) {
-            categoryList.add((long) c);
-        }
+       // for (Integer i : users) {
+       //     usersIds.add((long) i);
+       // }
+       // for (Integer c : categories) {
+       //     categoryList.add((long) c);
+       // }
 
-        String datePattern = "yyyy-MM-dd HH:mm:ss";
-        LocalDateTime rs = LocalDateTime.parse(rangeStart, DateTimeFormatter.ofPattern(datePattern));
-        LocalDateTime re = LocalDateTime.parse(rangeEnd, DateTimeFormatter.ofPattern(datePattern));
+        //String datePattern = "yyyy-MM-dd HH:mm:ss";
+       // LocalDateTime rs = LocalDateTime.parse(rangeStart, DateTimeFormatter.ofPattern(datePattern));
+       // LocalDateTime re = LocalDateTime.parse(rangeEnd, DateTimeFormatter.ofPattern(datePattern));
 
-        return eventsRepository.findEvents(usersIds, eventStates, categoryList, rs, re);
+        return eventsRepository.findEvents(users, eventStates, categories, rangeStart, rangeEnd);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class AdminEventsServiceImpl implements AdminEventsService {
         return updateEventAdminRequest;
     }
 
-    public List<EventState> findByState(String[] states) {
+    public List<EventState> findByState(List<String> states) {
         List<EventState> eventStates = new ArrayList<>();
         for (String s : states) {
             for (EventState state : EventState.values()) {
