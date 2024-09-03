@@ -7,8 +7,8 @@ import java.util.List;
 
 public interface PublicEventsService {
 
-    List<Event> getEvents(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart,
-                          LocalDateTime rangeEnd, Boolean onlyAvailable, String sort);
+    List<Event> getEvents(String text, List<Long> categories, Boolean paid, String rangeStart,
+                          String rangeEnd, Boolean onlyAvailable, String sort);
 
     Event getEventById(int eventId);
 }

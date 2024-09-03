@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.admin.category.Category;
 
-import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor

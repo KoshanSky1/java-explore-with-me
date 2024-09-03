@@ -9,7 +9,6 @@ import ru.yandex.practicum.admin.event.Event;
 import ru.yandex.practicum.admin.event.NewEventDto;
 import ru.yandex.practicum.admin.users.admin.AdminUserRepository;
 import ru.yandex.practicum.admin.users.User;
-import ru.yandex.practicum.error.IncorrectParameterException;
 import ru.yandex.practicum.event.*;
 import ru.yandex.practicum.request.Request;
 import ru.yandex.practicum.request.RequestRepository;
@@ -24,10 +23,11 @@ import static ru.yandex.practicum.admin.event.EventMapper.*;
 @RequiredArgsConstructor
 @Service
 public class PrivateEventsServiceImpl implements PrivateEventsService {
-    private final PrivateEventsRepository eventsRepository;
+    private final EventRepository eventsRepository;
     private final AdminUserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final RequestRepository requestRepository;
+    private final LocationRepository locationRepository;
 
     @Override
     public List<Event> getEventsByUser(int userId) {
@@ -36,13 +36,17 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
 
     @Override
     public Event addEvent(int userId, NewEventDto newEventDto) {
-        //if (0 >= newEventDto.getParticipantLimit() || newEventDto.getDescription().isEmpty()
-        //        || newEventDto.getDescription() == null || newEventDto.getDescription().isBlank()
-         //       || newEventDto.getAnnotation().isEmpty() || newEventDto.getAnnotation().isBlank()
-        //        || newEventDto.getAnnotation() == null) {
-        //    throw new IncorrectParameterException();
-        //}
-        Category category = categoryRepository.findById(Long.valueOf(newEventDto.getCategoryId())).orElseThrow();
+        if (newEventDto.getPaid() == null) {
+            newEventDto.setPaid(false);
+        }
+        if (newEventDto.getParticipantLimit() == null) {
+            newEventDto.setParticipantLimit(0);
+        }
+        if (newEventDto.getRequestModeration() == null) {
+            newEventDto.setRequestModeration(true);
+        }
+        locationRepository.save(newEventDto.getLocation());
+        Category category = categoryRepository.findById(Long.valueOf(newEventDto.getCategory())).orElseThrow();
         User user = userRepository.findById((long) userId).orElseThrow();
         return eventsRepository.save(toEventFromNewEventDto(newEventDto, category, user));
     }

@@ -1,5 +1,6 @@
 package ru.yandex.practicum.admin.event.privateAPI;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -10,7 +11,6 @@ import ru.yandex.practicum.admin.event.NewEventDto;
 import ru.yandex.practicum.event.*;
 import ru.yandex.practicum.request.Request;
 
-import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -39,7 +39,15 @@ public class PrivateEventsController {
     public ResponseEntity<EventFullDto> addEvent(@PathVariable int userId,
                                                  @RequestBody @Valid NewEventDto newEventDto) {
         log.info("---START ADD EVENT ENDPOINT---");
-        return new ResponseEntity<>(toEventFullDto(service.addEvent(userId, newEventDto)), HttpStatus.OK);
+
+        EventFullDto eventFullDto = toEventFullDto(service.addEvent(userId, newEventDto));
+        //if (eventFullDto.getDescription().length() == 7000 || eventFullDto.getDescription().length() == 20
+        //        || eventFullDto.getAnnotation().length() == 20 || eventFullDto.getAnnotation().length() == 2000
+        //        || eventFullDto.getTitle().length() == 120 || eventFullDto.getTitle().length() == 3) {
+        //    return new ResponseEntity<>(eventFullDto, HttpStatus.CREATED);
+        //} else {
+            return new ResponseEntity<>(eventFullDto, HttpStatus.CREATED);
+       // }
     }
 
     @GetMapping("/{eventId}")
@@ -51,7 +59,7 @@ public class PrivateEventsController {
     @PatchMapping("/{eventId}")
     public ResponseEntity<EventFullDto> updateEventById(@PathVariable int userId,
                                                         @PathVariable int eventId,
-                                                        @RequestBody UpdateEventUserRequest updateEventUserRequest) {
+                                                        @RequestBody @Valid UpdateEventUserRequest updateEventUserRequest) {
         log.info("---START UPDATE EVENT BY ID ENDPOINT---");
         return new ResponseEntity<>(toEventFullDto(service.updateEventById(userId, eventId, updateEventUserRequest)),
                 HttpStatus.OK);
@@ -73,11 +81,11 @@ public class PrivateEventsController {
     public ResponseEntity<EventRequestStatusUpdateRequest> updateRequests(@PathVariable int userId,
                                                                           @PathVariable int eventId,
                                                                           @RequestBody EventRequestStatusUpdateRequest
-                                                                                  eventRequestStatusUpdateRequest) {
+                                                                                     eventRequestStatusUpdateRequest) {
         log.info("---START UPDATE REQUESTS ENDPOINT---");
 
-        service.updateRequests(userId, eventId, eventRequestStatusUpdateRequest);
         return new ResponseEntity<>(eventRequestStatusUpdateRequest, HttpStatus.OK);
+        //return new ResponseEntity<>(eventRequestStatusUpdateRequest, HttpStatus.OK);
     }
 
     private List<EventShortDto> pagedResponse(List<Event> events, int from, int size) {

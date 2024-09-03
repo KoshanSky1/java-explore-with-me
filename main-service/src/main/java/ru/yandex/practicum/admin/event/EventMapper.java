@@ -7,6 +7,7 @@ import ru.yandex.practicum.admin.users.User;
 import ru.yandex.practicum.event.EventFullDto;
 import ru.yandex.practicum.event.EventShortDto;
 import ru.yandex.practicum.event.UpdateEventUserRequest;
+import ru.yandex.practicum.request.Request;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -56,12 +57,12 @@ public class EventMapper {
 
     public static EventFullDto toEventFullDto(Event event) {
         return new EventFullDto(
+                event.getId(),
                 event.getAnnotation(),
                 toCategoryDto(event.getCategory()),
                 event.getCreatedOn(),
                 event.getDescription(),
                 event.getEventDate(),
-                event.getId(),
                 toUserShortDto(event.getInitiator()),
                 event.getLocation(),
                 event.getPaid(),
@@ -125,6 +126,7 @@ public class EventMapper {
 
         return eventsShortDto;
     }
+    
 
 
 

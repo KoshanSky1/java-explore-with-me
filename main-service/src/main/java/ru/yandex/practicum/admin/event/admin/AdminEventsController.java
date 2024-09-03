@@ -9,7 +9,6 @@ import ru.yandex.practicum.admin.event.Event;
 import ru.yandex.practicum.admin.event.UpdateEventAdminRequest;
 import ru.yandex.practicum.event.*;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,14 +26,13 @@ public class AdminEventsController {
     public ResponseEntity<List<EventFullDto>> getEvents(@RequestParam(required = false) List<Long> users,
                                                         @RequestParam(required = false) List<String> states,
                                                         @RequestParam(required = false) List<Long> categories,
-                                                        @RequestParam(required = false) LocalDateTime rangeStart,
-                                                        @RequestParam(required = false) LocalDateTime rangeEnd,
+                                                        @RequestParam(required = false) String rangeStart,
+                                                        @RequestParam(required = false) String rangeEnd,
                                                         @RequestParam(defaultValue = "0") int from,
                                                         @RequestParam(defaultValue = "10") int size) {
         log.info("---START GET EVENTS ENDPOINT---");
         return new ResponseEntity<>(pagedResponse(service.getEvents(users, states, categories, rangeStart, rangeEnd),
-                from, size),
-                HttpStatus.OK);
+                from, size), HttpStatus.OK);
     }
 
     @PatchMapping("/{eventId}")

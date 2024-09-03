@@ -1,5 +1,6 @@
 package ru.yandex.practicum.admin.category.admin;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -17,15 +18,21 @@ public class AdminCategoryController {
     private final AdminCategoryService service;
 
     @PostMapping
-    public ResponseEntity<CategoryDto> addCategory(@RequestBody NewCategoryDto newCategoryDto) {
+    public ResponseEntity<CategoryDto> addCategory(@RequestBody @Valid NewCategoryDto newCategoryDto) {
         log.info("---START ADD CATEGORY ENDPOINT---");
-        return new ResponseEntity<>(CategoryMapper.toCategoryDto(service.addCategory(newCategoryDto)), HttpStatus.OK);
+        CategoryDto categoryDto = CategoryMapper.toCategoryDto(service.addCategory(newCategoryDto));
+       // if (categoryDto.getName().length() == 50) {
+        return new ResponseEntity<>(categoryDto, HttpStatus.CREATED);
+       // } else {
+        //    return new ResponseEntity<>(categoryDto, HttpStatus.OK);
+       // }
     }
 
     @DeleteMapping("/{catId}")
-    public void deleteCategoryById(@PathVariable int catId) {
+    public ResponseEntity<Void> deleteCategoryById(@PathVariable int catId) {
         log.info("---START DELETE CATEGORY BY ID ENDPOINT---");
         service.deleteCategoryById(catId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PatchMapping("/{catId}")

@@ -9,7 +9,6 @@ import ru.yandex.practicum.admin.event.Event;
 import ru.yandex.practicum.event.EventFullDto;
 import ru.yandex.practicum.event.EventShortDto;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,11 +25,10 @@ public class PublicEventsController {
 
     @GetMapping
     public ResponseEntity<List<EventShortDto>> getEvents(@RequestParam(required = false) String text,
-                                                         //@RequestParam(required = false) int[] categories,
                                                          @RequestParam(required = false) List<Long> categories,
-                                                         @RequestParam(required = false) boolean paid,
-                                                         @RequestParam(required = false) LocalDateTime rangeStart,
-                                                         @RequestParam(required = false) LocalDateTime rangeEnd,
+                                                         @RequestParam(required = false) Boolean paid,
+                                                         @RequestParam(required = false) String rangeStart,
+                                                         @RequestParam(required = false) String rangeEnd,
                                                          @RequestParam(defaultValue = "false") Boolean onlyAvailable,
                                                          @RequestParam(defaultValue = "EVENT_DATE") String sort,
                                                          @RequestParam(defaultValue = "0") int from,

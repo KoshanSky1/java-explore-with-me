@@ -8,5 +8,5 @@ import java.util.Optional;
 public interface PublicCategoriesService {
     List<Category> getCategories();
 
-    Optional<Category> getCategoryById(Long catId);
+    Category getCategoryById(Long catId);
 }

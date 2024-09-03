@@ -5,7 +5,7 @@ import java.util.Optional;
 
 public interface PublicCompilationService {
 
-    List<Compilation> getCompilations(boolean pinned);
+    List<Compilation> getCompilations(Boolean pinned);
 
     Optional<Compilation> getCompilationById(long compId);
 }

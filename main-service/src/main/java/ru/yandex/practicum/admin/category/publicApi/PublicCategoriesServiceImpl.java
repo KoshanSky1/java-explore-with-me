@@ -5,23 +5,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.admin.category.Category;
 import ru.yandex.practicum.admin.category.CategoryRepository;
+import ru.yandex.practicum.error.NotFoundException;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class PublicCategoriesServiceImpl implements PublicCategoriesService {
-    CategoryRepository publicCategoriesRepository;
+    private final CategoryRepository repository;
 
     @Override
     public List<Category> getCategories() {
-        return publicCategoriesRepository.findAll();
+        return repository.findAll();
     }
 
     @Override
-    public Optional<Category> getCategoryById(Long catId) {
-        return publicCategoriesRepository.findById(catId);
+    public Category getCategoryById(Long catId) {
+        return repository.findById(catId).orElseThrow(NotFoundException::new);
     }
 }

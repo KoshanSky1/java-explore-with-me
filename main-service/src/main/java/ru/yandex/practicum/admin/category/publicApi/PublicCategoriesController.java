@@ -31,7 +31,7 @@ public class PublicCategoriesController {
     @GetMapping("/{catId}")
     public ResponseEntity<CategoryDto> getCategoryById(@PathVariable Long catId) {
         log.info("---START GET CATEGORY BY ID ENDPOINT---");
-        return new ResponseEntity<>(toCategoryDto(service.getCategoryById(catId).orElseThrow()), HttpStatus.OK);
+        return new ResponseEntity<>(toCategoryDto(service.getCategoryById(catId)), HttpStatus.OK);
     }
 
     private List<CategoryDto> pagedResponse(List<Category> categories, int from, int size) {

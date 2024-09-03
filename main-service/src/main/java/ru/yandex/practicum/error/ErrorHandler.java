@@ -15,8 +15,29 @@ public class ErrorHandler {
         return new ApiError(
                 "BAD_REQUEST",
                 "Incorrectly made request.",
-                "Failed to convert value of type java.lang.String to required type long; " +
-                        "nested exception is java.lang.NumberFormatException: For input string: ad",
+                e.getMessage(),
+                LocalDateTime.now().toString()
+        );
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiError handleNotFoundException(NotFoundException e) {
+        return new ApiError(
+                "NOT_FOUND",
+                "The required object was not found.",
+                "Event with id=13 was not found",
+                LocalDateTime.now().toString()
+        );
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleNotFoundException(ConflictException e) {
+        return new ApiError(
+                "NOT_FOUND",
+                "The required object was not found.",
+                e.getMessage(),
                 LocalDateTime.now().toString()
         );
     }

@@ -13,8 +13,12 @@ public class PublicCompilationServiceImpl implements PublicCompilationService {
     private final PublicCompilationRepository repository;
 
     @Override
-    public List<Compilation> getCompilations(boolean pinned) {
-        return repository.findAllByPinned(pinned);
+    public List<Compilation> getCompilations(Boolean pinned) {
+        if (pinned != null) {
+            return repository.findAllByPinned(pinned);
+        } else {
+            return repository.findAll();
+        }
     }
 
     @Override

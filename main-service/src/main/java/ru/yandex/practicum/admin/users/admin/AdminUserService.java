@@ -6,7 +6,7 @@ import ru.yandex.practicum.admin.users.User;
 import java.util.List;
 
 public interface AdminUserService {
-    List<User> getUsers(int[] ids);
+    List<User> getUsers(List<Long> ids);
 
     User postUser(NewUserRequest newUserRequest);
 

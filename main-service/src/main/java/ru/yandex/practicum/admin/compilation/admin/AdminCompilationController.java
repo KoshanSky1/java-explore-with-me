@@ -1,5 +1,6 @@
 package ru.yandex.practicum.admin.compilation.admin;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,20 +20,20 @@ public class AdminCompilationController {
     private final AdminCompilationService service;
 
     @PostMapping
-    public ResponseEntity<CompilationDto> postCompilation(@RequestBody NewCompilationDto newCompilationDto) {
+    public ResponseEntity<CompilationDto> postCompilation(@RequestBody @Valid NewCompilationDto newCompilationDto) {
         log.info("---START POST COMPILATION ENDPOINT---");
-        return new ResponseEntity<>(toCompilationDto(service.postCompilation(newCompilationDto)), HttpStatus.OK);
+        return new ResponseEntity<>(toCompilationDto(service.postCompilation(newCompilationDto)), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{compId}")
-    public void deleteCompilation(@PathVariable int compId) {
+    public ResponseEntity<Void> deleteCompilation(@PathVariable int compId) {
         log.info("---START DELETE COMPILATION BY ID ENDPOINT---");
-        service.deleteCompilation(compId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PatchMapping("/{compId}")
     public CompilationDto updateCompilationById(@PathVariable int compId,
-                                                @RequestBody UpdateCompilationRequest updateCompilationRequest) {
+                                                @RequestBody @Valid UpdateCompilationRequest updateCompilationRequest) {
         log.info("---START UPDATE COMPILATION BY ID ENDPOINT---");
         return toCompilationDto(service.updateCompilationById(compId, updateCompilationRequest));
     }

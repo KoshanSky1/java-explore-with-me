@@ -5,7 +5,7 @@ import ru.yandex.practicum.admin.event.Event;
 
 import java.util.List;
 
-public interface PrivateEventsRepository extends JpaRepository<Event, Long> {
+public interface EventRepository extends JpaRepository<Event, Long> {
 
     List<Event> findAllByInitiatorId(int userId);
 

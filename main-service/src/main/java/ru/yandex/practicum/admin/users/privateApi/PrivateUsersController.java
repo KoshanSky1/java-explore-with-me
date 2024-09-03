@@ -40,7 +40,7 @@ public class PrivateUsersController {
                                                                         @RequestParam int eventId) {
         log.info("---START POST REQUEST ENDPOINT---");
         return new ResponseEntity<>(toParticipationRequestDto(service.postRequestsByUserId(userId, eventId)),
-                HttpStatus.OK);
+                HttpStatus.CREATED);
     }
 
     @PatchMapping("/{requestId}/cancel")

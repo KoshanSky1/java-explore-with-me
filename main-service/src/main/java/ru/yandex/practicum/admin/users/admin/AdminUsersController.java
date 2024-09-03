@@ -1,5 +1,8 @@
 package ru.yandex.practicum.admin.users.admin;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,21 +26,32 @@ public class AdminUsersController {
     private final AdminUserService service;
 
     @GetMapping
-    public ResponseEntity<List<UserDto>> getUsers(@RequestParam int[] ids, int from, int size) {
+    public ResponseEntity<List<UserDto>> getUsers(@RequestParam(required = false) List<Long> ids,
+                                                  @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                                  @RequestParam(defaultValue = "10") int size) {
         log.info("---START GET USERS ENDPOINT---");
         return new ResponseEntity<>(pagedResponse(service.getUsers(ids), from, size), HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> postUser(@RequestBody NewUserRequest newUserRequest) {
+    public ResponseEntity<UserDto> postUser(@RequestBody @Valid NewUserRequest newUserRequest) {
         log.info("---START POST USER ENDPOINT---");
-        return new ResponseEntity<>(toUserDto(service.postUser(newUserRequest)), HttpStatus.OK);
-    }
+        UserDto userDto = toUserDto(service.postUser(newUserRequest));
+        ////if (userDto.getName().length() == 2 || userDto.getName().length() == 250 || userDto.getEmail().length() == 6
+        //   || userDto.getEmail().length() == 64) {
+        //    return new ResponseEntity<>(userDto, HttpStatus.CREATED);
+       // } else {
+        return new ResponseEntity<>(userDto, HttpStatus.CREATED);
+        }
+
+        //return new ResponseEntity<>(toUserDto(service.postUser(newUserRequest)), HttpStatus.OK);
+    //}
 
     @DeleteMapping("/{userId}")
-    public void deleteUserById(@PathVariable int userId) {
+    public ResponseEntity<Void> deleteUserById(@PathVariable int userId) {
         log.info("---START DELETE USER BY ID ENDPOINT---");
         service.deleteUserById(userId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     private List<UserDto> pagedResponse(List<User> users, int from, int size) {

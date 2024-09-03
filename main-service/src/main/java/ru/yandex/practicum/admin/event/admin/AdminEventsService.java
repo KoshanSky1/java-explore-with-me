@@ -8,8 +8,8 @@ import java.util.List;
 
 public interface AdminEventsService {
 
-    List<Event> getEvents(List<Long> users, List<String> states, List<Long> categories, LocalDateTime rangeStart,
-                          LocalDateTime rangeEnd);
+    List<Event> getEvents(List<Long> users, List<String> states, List<Long> categories, String rangeStart,
+                          String rangeEnd);
 
     UpdateEventAdminRequest updateEventById(int eventId, UpdateEventAdminRequest updateEventAdminRequest);
 
