@@ -1,14 +1,15 @@
 package ru.yandex.practicum.event.publicAPI;
 
-import ru.yandex.practicum.admin.event.Event;
+import jakarta.servlet.http.HttpServletRequest;
+import ru.yandex.practicum.event.dto.EventShortDto;
+import ru.yandex.practicum.event.model.Event;
+import ru.yandex.practicum.event.model.search.SearchEventsArgs;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PublicEventsService {
 
-    List<Event> getEvents(String text, List<Long> categories, Boolean paid, String rangeStart,
-                          String rangeEnd, Boolean onlyAvailable, String sort);
+    List<EventShortDto> getEvents(SearchEventsArgs args);
 
-    Event getEventById(int eventId);
+    Event getEventById(int eventId, HttpServletRequest request);
 }

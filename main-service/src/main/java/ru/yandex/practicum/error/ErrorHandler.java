@@ -26,11 +26,11 @@ public class ErrorHandler {
         return new ApiError(
                 "NOT_FOUND",
                 "The required object was not found.",
-                "Event with id=13 was not found",
+                e.getMessage(),
                 LocalDateTime.now().toString()
         );
     }
-
+//"Event with id=13 was not found"
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handleNotFoundException(ConflictException e) {

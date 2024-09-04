@@ -2,14 +2,12 @@ package ru.yandex.practicum.compilation.dto;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.admin.compilation.NewCompilationDto;
-import ru.yandex.practicum.admin.compilation.UpdateCompilationRequest;
-import ru.yandex.practicum.admin.event.Event;
-import ru.yandex.practicum.compilation.Compilation;
+import ru.yandex.practicum.event.model.Event;
+import ru.yandex.practicum.compilation.model.Compilation;
 
 import java.util.List;
 
-import static ru.yandex.practicum.admin.event.EventMapper.toListEventShortDto;
+import static ru.yandex.practicum.event.dto.EventMapper.toListEventShortDtoFromListEvents;
 
 @Component
 @RequiredArgsConstructor
@@ -20,7 +18,7 @@ public class CompilationMapper {
                 compilation.getId(),
                 compilation.getTitle(),
                 compilation.isPinned(),
-                toListEventShortDto(compilation.getEvents())
+                toListEventShortDtoFromListEvents(compilation.getEvents())
         );
     }
 
