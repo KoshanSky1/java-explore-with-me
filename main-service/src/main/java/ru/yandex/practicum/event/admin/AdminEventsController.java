@@ -37,8 +37,13 @@ public class AdminEventsController {
                                                         @RequestParam(defaultValue = "0") int from,
                                                         @RequestParam(defaultValue = "10") int size) {
         log.info("---START GET EVENTS ENDPOINT---");
-        return new ResponseEntity<>(pagedResponse(service.getEvents(users, states, categories, rangeStart, rangeEnd),
-                from, size), HttpStatus.OK);
+        List<Event> events = service.getEvents(users, states, categories, rangeStart, rangeEnd);
+        for (Event e : events) {
+            if (e.getConfirmedRequests() == null) {
+                e.setConfirmedRequests(0);
+            }
+        }
+        return new ResponseEntity<>(pagedResponse(events, from, size), HttpStatus.OK);
     }
 
     @PatchMapping("/{eventId}")

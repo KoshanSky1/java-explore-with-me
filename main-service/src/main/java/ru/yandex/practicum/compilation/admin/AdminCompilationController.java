@@ -28,6 +28,7 @@ public class AdminCompilationController {
     @DeleteMapping("/{compId}")
     public ResponseEntity<Void> deleteCompilation(@PathVariable int compId) {
         log.info("---START DELETE COMPILATION BY ID ENDPOINT---");
+        service.deleteCompilation(compId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -36,7 +37,7 @@ public class AdminCompilationController {
                                                                 @RequestBody @Valid UpdateCompilationRequest updateCompilationRequest) {
         log.info("---START UPDATE COMPILATION BY ID ENDPOINT---");
         return new ResponseEntity<>(toCompilationDto(service.updateCompilationById(compId, updateCompilationRequest)),
-                HttpStatus.CREATED);
+                HttpStatus.OK);
     }
 
 }

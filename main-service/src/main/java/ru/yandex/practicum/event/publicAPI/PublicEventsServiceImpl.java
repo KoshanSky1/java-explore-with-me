@@ -53,7 +53,8 @@ public class PublicEventsServiceImpl implements PublicEventsService {
                 -> new NotFoundException(String.format("Event not found with id = " + eventId)));
 
         if (!event.getState().equals(EventState.PUBLISHED)) {
-            throw new ConflictException(String.format("Event with id=%d is not published", eventId));
+            System.out.println("hi");
+            throw new NotFoundException("Event with id=" + eventId + " is not published");
         }
         saveEndpointHit(request);
         event.setViews(event.getViews() + 1);

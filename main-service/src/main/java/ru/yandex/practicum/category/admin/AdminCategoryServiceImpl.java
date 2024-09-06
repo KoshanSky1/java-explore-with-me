@@ -35,7 +35,9 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
     @Override
     public void deleteCategoryById(long catId) {
         Category category = repository.findById(catId).orElseThrow();
+        System.out.println(category);
         if (eventRepository.existsByCategory(category)) {
+            System.out.println(eventRepository.existsByCategory(category));
             throw new ConflictException("For the requested operation the conditions are not met.");
         } else {
             repository.deleteById(catId);
@@ -47,7 +49,7 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
         Category category = repository.findById(catId).orElseThrow();
         try {
             category.setName(newCategoryDto.getName());
-            repository.save(toCategoryFromNewCategoryDto(newCategoryDto));
+            repository.save(category);
         } catch (DataIntegrityViolationException e) {
             throw new ConflictException("could not execute statement; SQL [n/a]; constraint [uq_category_name]; " +
                     " nested exception is org.hibernate.exception.ConstraintViolationException: "

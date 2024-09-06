@@ -30,19 +30,19 @@ public class PublicEventsController {
 
     @GetMapping
     public ResponseEntity<List<EventShortDto>> getEvents(@RequestParam(required = false)
-                                                        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-                                                        LocalDateTime rangeStart,
-                                                        @RequestParam(required = false)
-                                                        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-                                                        LocalDateTime rangeEnd,
-                                                        @RequestParam(required = false) String text,
-                                                        @RequestParam(required = false) List<Long> categories,
-                                                        @RequestParam(required = false) Boolean paid,
-                                                        @RequestParam(defaultValue = "false") Boolean onlyAvailable,
-                                                        @RequestParam(required = false) String sort,
-                                                        @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
-                                                        @RequestParam(defaultValue = "10") @Positive Integer size,
-                                                        HttpServletRequest request) {
+                                                         @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                                         LocalDateTime rangeStart,
+                                                         @RequestParam(required = false)
+                                                         @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                                         LocalDateTime rangeEnd,
+                                                         @RequestParam(required = false) String text,
+                                                         @RequestParam(required = false) List<Long> categories,
+                                                         @RequestParam(required = false) Boolean paid,
+                                                         @RequestParam(defaultValue = "false") Boolean onlyAvailable,
+                                                         @RequestParam(required = false) String sort,
+                                                         @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                                         @RequestParam(defaultValue = "10") @Positive Integer size,
+                                                         HttpServletRequest request) {
 
         log.info("---START GET EVENTS ENDPOINT---");
 

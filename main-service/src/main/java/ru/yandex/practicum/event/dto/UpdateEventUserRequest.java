@@ -11,6 +11,7 @@ import org.hibernate.validator.constraints.Length;
 import ru.yandex.practicum.category.dto.CategoryDto;
 import ru.yandex.practicum.event.model.enums.EventStateAction;
 import ru.yandex.practicum.event.model.Location;
+import ru.yandex.practicum.event.model.enums.StateAction;
 
 import java.time.LocalDateTime;
 
@@ -18,13 +19,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateEventUserRequest {
-    @NotNull
-    @NotBlank
+    //@NotNull
+    //@NotBlank
     @Length(min = 20, max = 2000)
     private String annotation;
     private Integer category;
-    @NotNull
-    @NotBlank
+    //@NotNull
+    //@NotBlank
     @Length(min = 20, max = 7000)
     private String description;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
@@ -34,9 +35,9 @@ public class UpdateEventUserRequest {
     @PositiveOrZero
     private Integer participantLimit;
     private Boolean requestModeration;
-    private EventStateAction stateAction;
-    @NotNull
-    @NotBlank
+    private StateAction stateAction;
+    //@NotNull
+    //@NotBlank
     @Length(min = 3, max = 120)
     private String title;
 }

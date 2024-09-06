@@ -39,13 +39,18 @@ public class PrivateUsersServiceImpl implements PrivateUsersService {
     public Request postRequestsByUserId(int userId, int eventId) {
         Event event = eventsRepository.findById((long) eventId).orElseThrow(()
                 -> new NotFoundException("Event not found with id = " + eventId));
+
         User user = usersRepository.findById((long) userId).orElseThrow(()
                 -> new NotFoundException(String.format("User not found with id = " + userId)));
 
-        if (event.getInitiator().getId() != user.getId()) {
+        Integer сonfirmedRequests = event.getConfirmedRequests();
+
+        if (repository.existsByRequesterIdAndEventId(userId, eventId)) {
             throw new ConflictException("Request with requesterId= " +  userId + " and eventId" + eventId + " already exist");
         }
-        if (event.getInitiator().getId() != userId) {
+        if (event.getInitiator().getId() == userId) {
+            System.out.println(event.getInitiator().getId());
+            System.out.println(userId);
             throw new ConflictException(String.format("User with id=%d must not be equal to initiator", userId));
         }
         if (!event.getState().equals(EventState.PUBLISHED)) {
@@ -55,7 +60,10 @@ public class PrivateUsersServiceImpl implements PrivateUsersService {
             throw new ConflictException(String.format("Event with id=%d has reached participant limit", eventId));
         }
         if (!event.getRequestModeration()) {
-            event.setConfirmedRequests(event.getConfirmedRequests() + 1);
+            if (сonfirmedRequests == null) {
+                сonfirmedRequests = 0;
+            }
+            event.setConfirmedRequests(сonfirmedRequests + 1);
             event = eventsRepository.save(event);
         }
 
@@ -66,7 +74,7 @@ public class PrivateUsersServiceImpl implements PrivateUsersService {
     public Request updateRequestsByUserId(int userId, int requestId) {
         Request request = repository.findByIdAndRequesterId(requestId, userId);
         if (request == null) {
-            throw new NotFoundException("Request with id= " + requestId +
+            throw new ConflictException("Request with id= " + requestId +
                     "and requesterId= " + userId + " was not found");
         }
         request.setStatus(EventStatus.CANCELED);

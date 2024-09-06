@@ -15,6 +15,7 @@ import ru.yandex.practicum.event.model.Event;
 import ru.yandex.practicum.event.model.Location;
 import ru.yandex.practicum.event.model.enums.EventState;
 import ru.yandex.practicum.event.model.enums.EventStatus;
+import ru.yandex.practicum.event.model.enums.StateAction;
 import ru.yandex.practicum.event.repository.EventRepository;
 import ru.yandex.practicum.event.repository.LocationRepository;
 import ru.yandex.practicum.request.model.Request;
@@ -22,6 +23,7 @@ import ru.yandex.practicum.request.repository.RequestRepository;
 import ru.yandex.practicum.users.model.User;
 import ru.yandex.practicum.users.repository.UserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -59,15 +61,16 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
             newEventDto.setRequestModeration(true);
         }
 
-        Category category = categoryRepository.findById(Long.valueOf(newEventDto.getCategory())).orElseThrow(()
-                -> new NotFoundException(String.format("Category with id=%d was not found",
-                newEventDto.getCategory())));
+        //System.out.println(newEventDto.getCategory());
+        //System.out.println(categoryRepository.findAll());
+        Category category = categoryRepository.findById(Long.valueOf(newEventDto.getCategory())).orElseThrow();
+
         User user = userRepository.findById((long) userId).orElseThrow(()
                 -> new NotFoundException(String.format("User with id=%d was not found", userId)));
         Location location = locationRepository.save(toLocation(newEventDto.getLocation()));
-
+        //event.setConfirmedRequests(0);
         try {
-            eventRepository.save(toEventFromNewEventDto(newEventDto, category, user, location));
+            event = eventRepository.save(toEventFromNewEventDto(newEventDto, category, user, location));
         } catch (DataIntegrityViolationException e) {
             throw new ConflictException("Field: category. Error: must not be blank. Value: null");
         }
@@ -86,6 +89,7 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
 
     @Override
     public Event updateEventById(int userId, int eventId, UpdateEventUserRequest updateEventUserRequest) {
+       // System.out.println(updateEventUserRequest);
         Event event = eventRepository.findById((long) eventId).orElseThrow(() -> new NotFoundException(
                 String.format("Event not found with id = %s and userId = %s", eventId, userId)));
         if (event.getInitiator().getId() != userId) {
@@ -98,34 +102,45 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
                             updateEventUserRequest.getCategory()))));
         }
 
-        //if (updateEventUserRequest.getStateAction().equals(EventState.PUBLISHED)) {
-        //    throw new ConflictException("Event must not be published");
-        //}
-
-        //UtilMergeProperty.copyProperties(eventUpdate, eventTarget);
-        if (updateEventUserRequest.getStateAction().toString().equals("CANCEL_REVIEW")) {
-            event.setState(EventState.CANCELED);
-        } else if (updateEventUserRequest.getStateAction().toString().equals("SEND_TO_REVIEW")) {
-            event.setState(EventState.getEventState("PENDING"));
+        if (event.getState().equals(EventState.PUBLISHED)) {
+            System.out.println("hi");
+            throw new ConflictException("Event must not be published");
         }
-            return event;
-        //eventRepository.flush();
-        //log.info("Update event: {}", eventTarget.getTitle());
-        //return EventMapper.toEventFullDto(eventTarget);
 
-        //User user = userRepository.findById((long) userId).orElseThrow();
-        //return eventsRepository.save(toEventFromUpdateEventUserRequest(updateEventUserRequest, eventId, user));
+        System.out.println(updateEventUserRequest.getStateAction());
+        if (StateAction.CANCEL_REVIEW.toString().equals(updateEventUserRequest.getStateAction().toString())) {
+            event.setState(EventState.CANCELED);
+        } else if (StateAction.SEND_TO_REVIEW.toString().equals(updateEventUserRequest.getStateAction().toString())) {
+            event.setState(EventState.PENDING);
+        }
+        System.out.println(event);
+        return event;
     }
 
     @Override
     public List<Request> getRequests(int userId, int eventId) {
-        List<Request> requests = requestRepository.findAllByEventId(eventId);
-        for (Request request : requests) {
-            if (request.getRequester().getId() != userId) {
-                requests.remove(request);
+        //System.out.println(eventId);
+        List<Request> allRequests = requestRepository.findAll();
+        System.out.println(allRequests);
+        System.out.println(userId);
+        System.out.println(eventId);
+        List<Request> requests = new ArrayList<>();
+
+        for (Request r : allRequests) {
+            System.out.println(r.getEvent().getId());
+            System.out.println(r.getEvent().getInitiator().getId());
+            if (r.getEvent().getId() == eventId && r.getEvent().getInitiator().getId() == userId) {
+                requests.add(r);
             }
         }
-        if (!requests.isEmpty()) {
+        //s
+        //List<Request> requests = requestRepository.findAllByEventId(eventId);
+        //for (Request request : requests) {
+        //    if (request.getRequester().getId() != userId) {
+        //        requests.remove(request);
+        //    }
+        //}
+        if (requests.isEmpty()) {
             throw new NotFoundException("Event not found with id = " + eventId + " and userId " + userId);
         }
         return requests;
@@ -146,10 +161,17 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
         if (event.getParticipantLimit() == 0 || !event.getRequestModeration()) {
             return List.of();
         }
-        final int freeRequests = (int) (event.getParticipantLimit() - event.getConfirmedRequests());
-        if (freeRequests <= 0) {
-            throw new ConflictException(String.format("Event with id=%d has reached participant limit", eventId));
+        final int freeRequests;
+        if (event.getConfirmedRequests() == null) {
+            freeRequests = 0;
+            event.setConfirmedRequests(0);
+        } else {
+            freeRequests = event.getParticipantLimit() - event.getConfirmedRequests();
         }
+
+        //if (freeRequests <= 0) {
+        //    throw new ConflictException(String.format("Event with id=%d has reached participant limit", eventId));
+        //}
         List<Request> requests = requestRepository.findAllByIdInAndStatus(requestIds, PENDING);
 
         AtomicInteger freeRequestsLeft = new AtomicInteger(freeRequests);

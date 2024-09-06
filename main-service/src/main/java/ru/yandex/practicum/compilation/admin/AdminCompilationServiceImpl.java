@@ -43,7 +43,9 @@ public class AdminCompilationServiceImpl implements AdminCompilationService {
 
     @Override
     public void deleteCompilation(int compId) {
+        System.out.println(repository.findById((long) compId));
         repository.deleteById((long) compId);
+        System.out.println(repository.findById((long) compId));
     }
 
     @Override
@@ -62,8 +64,9 @@ public class AdminCompilationServiceImpl implements AdminCompilationService {
         if (updateCompilationRequest.getPinned() != null) {
             compilation.setPinned(updateCompilationRequest.getPinned());
         }
+        if (updateCompilationRequest.getTitle() != null) {
             compilation.setTitle(updateCompilationRequest.getTitle());
-
+        }
         return repository.save(compilation);
     }
 }

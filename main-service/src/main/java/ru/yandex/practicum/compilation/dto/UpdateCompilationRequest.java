@@ -16,9 +16,9 @@ import java.util.Set;
 public class UpdateCompilationRequest {
     private Set<Integer> events;
     private Boolean pinned;
-    @NotNull
-    @NotBlank
-    @NotEmpty
+    //@NotNull
+    //@NotBlank
+    //@NotEmpty
     @Size(max = 128)
     private String title;
 }

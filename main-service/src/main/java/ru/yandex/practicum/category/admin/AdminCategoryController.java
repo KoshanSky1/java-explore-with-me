@@ -21,7 +21,7 @@ public class AdminCategoryController {
     public ResponseEntity<CategoryDto> addCategory(@RequestBody @Valid NewCategoryDto newCategoryDto) {
         log.info("---START ADD CATEGORY ENDPOINT---");
         CategoryDto categoryDto = CategoryMapper.toCategoryDto(service.addCategory(newCategoryDto));
-        return new ResponseEntity<>(categoryDto, HttpStatus.OK);
+        return new ResponseEntity<>(categoryDto, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{catId}")

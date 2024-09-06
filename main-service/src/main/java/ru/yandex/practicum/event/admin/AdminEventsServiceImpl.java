@@ -26,13 +26,18 @@ public class AdminEventsServiceImpl implements AdminEventsService {
                                  LocalDateTime rangeEnd) {
 
         List<EventState> eventStates = findByState(states);
-
-        return eventsRepository.findEvents(users, eventStates, categories, rangeStart, rangeEnd);
+        if (eventStates == null) {
+            return eventsRepository.findEventsWithoutStates(users, categories, rangeStart, rangeEnd);
+        } else {
+            //for ()
+            return eventsRepository.findEvents(users, eventStates, categories, rangeStart, rangeEnd);
+        }
     }
 
     @Override
     public Event updateEventById(int eventId, UpdateEventAdminRequest updateEventAdminRequest) {
         Event event = eventsRepository.findById((long) eventId).orElseThrow();
+        System.out.println(event.getAnnotation());
 
         if (event.getState().equals(EventState.PUBLISHED)) {
             throw new ConflictException("Cannot publish the event because it's not in the right state: PUBLISHED");
@@ -46,9 +51,8 @@ public class AdminEventsServiceImpl implements AdminEventsService {
                 event.setState(EventState.CANCELED);
             }
         }
-
-        return eventsRepository.save(EventMapper.toEventFromUpdateEventAdminRequest(updateEventAdminRequest, eventId, event.getInitiator(),
-                event.getCategory()));
+        System.out.println(event.getAnnotation());
+        return eventsRepository.save(event);
     }
 
     public List<EventState> findByState(List<String> states) {

@@ -2,11 +2,11 @@ package ru.yandex.practicum.event.dto;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.category.model.Category;
 import ru.yandex.practicum.event.model.Event;
 import ru.yandex.practicum.event.model.Location;
+import ru.yandex.practicum.event.model.enums.EventState;
 import ru.yandex.practicum.event.model.search.SearchEventsArgs;
 import ru.yandex.practicum.request.dto.ParticipationRequestDto;
 import ru.yandex.practicum.users.model.User;
@@ -29,7 +29,7 @@ public class EventMapper {
                 event.getAnnotation(),
                 toCategoryDto(event.getCategory()),
                 null,
-                event.getEventDate(),
+                event.getDate(),
                 toUserShortDto(event.getInitiator()),
                 event.getPaid(),
                 event.getTitle(),
@@ -39,6 +39,7 @@ public class EventMapper {
 
     public static Event toEventFromNewEventDto(NewEventDto newEventDto, Category category, User initiator,
                                                Location location) {
+        //System.out.println("f"+category);
         return new Event(
                 null,
                 newEventDto.getAnnotation(),
@@ -54,20 +55,22 @@ public class EventMapper {
                 newEventDto.getParticipantLimit(),
                 LocalDateTime.now(),
                 newEventDto.getRequestModeration(),
-                null,
+                EventState.PENDING,
                 newEventDto.getTitle(),
-                null
+                0
         );
     }
 
     public static EventFullDto toEventFullDto(Event event) {
+        System.out.println(event.getAnnotation());
         return new EventFullDto(
                 event.getId(),
                 event.getAnnotation(),
                 toCategoryDto(event.getCategory()),
+                event.getConfirmedRequests(),
                 event.getCreatedOn(),
                 event.getDescription(),
-                event.getEventDate(),
+                event.getDate(),
                 toUserShortDto(event.getInitiator()),
                 event.getLocation(),
                 event.getPaid(),
@@ -81,12 +84,12 @@ public class EventMapper {
     }
 
     public static Event toEventFromUpdateEventUserRequest(UpdateEventUserRequest updateEventUserRequest, int eventId,
-                                                          User initiator, Category category) {
+                                                          User initiator, Category category, Integer confirmedRequests) {
         return new Event(
                 (long) eventId,
                 updateEventUserRequest.getAnnotation(),
                 category,
-                null,
+                confirmedRequests,
                 LocalDateTime.now(),
                 updateEventUserRequest.getDescription(),
                 updateEventUserRequest.getEventDate(),
