@@ -10,6 +10,7 @@ import ru.yandex.practicum.error.ConflictException;
 import ru.yandex.practicum.error.NotFoundException;
 import ru.yandex.practicum.event.dto.EventRequestStatusUpdateRequest;
 import ru.yandex.practicum.event.dto.NewEventDto;
+import ru.yandex.practicum.event.dto.UpdateEventAdminRequest;
 import ru.yandex.practicum.event.dto.UpdateEventUserRequest;
 import ru.yandex.practicum.event.model.Event;
 import ru.yandex.practicum.event.model.Location;
@@ -68,7 +69,7 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
         User user = userRepository.findById((long) userId).orElseThrow(()
                 -> new NotFoundException(String.format("User with id=%d was not found", userId)));
         Location location = locationRepository.save(toLocation(newEventDto.getLocation()));
-        //event.setConfirmedRequests(0);
+        event.setConfirmedRequests(0);
         try {
             event = eventRepository.save(toEventFromNewEventDto(newEventDto, category, user, location));
         } catch (DataIntegrityViolationException e) {
@@ -89,7 +90,7 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
 
     @Override
     public Event updateEventById(int userId, int eventId, UpdateEventUserRequest updateEventUserRequest) {
-       // System.out.println(updateEventUserRequest);
+        // System.out.println(updateEventUserRequest);
         Event event = eventRepository.findById((long) eventId).orElseThrow(() -> new NotFoundException(
                 String.format("Event not found with id = %s and userId = %s", eventId, userId)));
         if (event.getInitiator().getId() != userId) {

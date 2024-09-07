@@ -26,12 +26,16 @@ public class AdminCompilationServiceImpl implements AdminCompilationService {
 
     @Override
     public Compilation postCompilation(NewCompilationDto newCompilationDto) {
+        //System.out.println(newCompilationDto);
         List<Event> events = new ArrayList<>();
         Set<Long> eventsIds = newCompilationDto.getEvents();
 
-        for (Long i : newCompilationDto.getEvents()) {
-            events.add(eventRepository.findById((i)).orElseThrow());
+        if (newCompilationDto.getEvents() != null) {
+            for (Long i : newCompilationDto.getEvents()) {
+                events.add(eventRepository.findById((i)).orElseThrow());
+            }
         }
+
         Compilation compilation = toCompilationFromNewCompilationDto(newCompilationDto, events);
 
         try {
@@ -54,19 +58,24 @@ public class AdminCompilationServiceImpl implements AdminCompilationService {
         List<Event> events = new ArrayList<>();
         Set<Integer> eventsIds = updateCompilationRequest.getEvents();
 
-        for (Integer i : updateCompilationRequest.getEvents()) {
-            events.add(eventRepository.findById(Long.valueOf(i)).orElseThrow());
+        if (updateCompilationRequest.getEvents() != null) {
+            for (Integer i : updateCompilationRequest.getEvents()) {
+                events.add(eventRepository.findById(Long.valueOf(i)).orElseThrow());
+            }
         }
 
         if (!events.isEmpty()) {
             compilation.setEvents(events);
         }
+
         if (updateCompilationRequest.getPinned() != null) {
             compilation.setPinned(updateCompilationRequest.getPinned());
         }
+
         if (updateCompilationRequest.getTitle() != null) {
             compilation.setTitle(updateCompilationRequest.getTitle());
         }
+
         return repository.save(compilation);
     }
 }

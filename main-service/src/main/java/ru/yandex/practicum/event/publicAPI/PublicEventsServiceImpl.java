@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.EndpointHitDto;
 import ru.yandex.practicum.error.ConflictException;
+import ru.yandex.practicum.error.IncorrectParameterException;
 import ru.yandex.practicum.event.dto.EventShortDto;
 import ru.yandex.practicum.event.model.Event;
 import ru.yandex.practicum.client.StatsClient;
@@ -38,11 +39,17 @@ public class PublicEventsServiceImpl implements PublicEventsService {
 
     @Override
     public List<EventShortDto> getEvents(SearchEventsArgs args) {
-        //Set<EventShortDto> eventShortDto = new ArrayList<>();
+
         CustomPageRequest pageable = createPagination(args.getSort(), args.getFrom(), args.getSize());
         SelectionCriteria selectionCriteria = createCriteria(args);
 
         saveEndpointHit(args.getRequest());
+
+        //System.out.println(args);
+       // if (args.getRangeEnd().isBefore(LocalDateTime.now())) {
+       //     throw new IncorrectParameterException("Field: category. Error: must not be blank. Value: null");
+       // }
+
         return toListEventShortDtoFromSetEvents(eventsRepository.findAllWithArgs(pageable,
                 selectionCriteria).toSet());
     }

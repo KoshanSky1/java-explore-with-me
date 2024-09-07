@@ -19,6 +19,6 @@ public class UpdateCompilationRequest {
     //@NotNull
     //@NotBlank
     //@NotEmpty
-    @Size(max = 128)
+    @Size(max = 50)
     private String title;
 }

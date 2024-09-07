@@ -15,6 +15,7 @@ import ru.yandex.practicum.event.dto.EventShortDto;
 import ru.yandex.practicum.event.model.search.SearchEventsArgs;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,11 +30,12 @@ public class PublicEventsController {
     private final PublicEventsService service;
 
     @GetMapping
-    public ResponseEntity<List<EventShortDto>> getEvents(@RequestParam(required = false)
-                                                         @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-                                                         LocalDateTime rangeStart,
+    public ResponseEntity<List<EventShortDto>> getEvents(//@RequestParam(required = false)
+                                                         //@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                                         //LocalDateTime rangeStart,
+                                                         @RequestParam(required = false) String rangeStart,
                                                          @RequestParam(required = false)
-                                                         @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                                         //@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
                                                          LocalDateTime rangeEnd,
                                                          @RequestParam(required = false) String text,
                                                          @RequestParam(required = false) List<Long> categories,
@@ -46,8 +48,24 @@ public class PublicEventsController {
 
         log.info("---START GET EVENTS ENDPOINT---");
 
-        SearchEventsArgs args = toSearchEventsArgs(rangeStart, rangeEnd, text, categories,
+        //String str = rangeStart;
+        //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        //LocalDateTime dateTime = LocalDateTime.parse(str, formatter);
+
+        SearchEventsArgs args = toSearchEventsArgs(rangeEnd, rangeEnd, text, categories,
                 paid, onlyAvailable, sort, from, size, request);
+
+        System.out.println(rangeStart);
+        System.out.println(rangeEnd);
+        System.out.println(text);
+        System.out.println(categories);
+        System.out.println(paid);
+        System.out.println(onlyAvailable);
+        System.out.println(sort);
+        System.out.println(from);
+        System.out.println(size);
+
+       /// for (service.)
 
         return new ResponseEntity<>(service.getEvents(args), HttpStatus.OK);
     }

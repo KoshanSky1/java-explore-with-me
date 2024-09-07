@@ -38,11 +38,11 @@ public class AdminEventsController {
                                                         @RequestParam(defaultValue = "10") int size) {
         log.info("---START GET EVENTS ENDPOINT---");
         List<Event> events = service.getEvents(users, states, categories, rangeStart, rangeEnd);
-        for (Event e : events) {
-            if (e.getConfirmedRequests() == null) {
-                e.setConfirmedRequests(0);
-            }
-        }
+       // for (Event e : events) {
+        //    if (e.getConfirmedRequests() == null) {
+         //       e.setConfirmedRequests(0);
+         //   }
+       // }
         return new ResponseEntity<>(pagedResponse(events, from, size), HttpStatus.OK);
     }
 

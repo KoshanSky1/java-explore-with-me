@@ -8,6 +8,7 @@ import ru.yandex.practicum.category.model.Category;
 import ru.yandex.practicum.category.repository.CategoryRepository;
 import ru.yandex.practicum.category.dto.NewCategoryDto;
 import ru.yandex.practicum.error.ConflictException;
+import ru.yandex.practicum.error.IncorrectParameterException;
 import ru.yandex.practicum.event.repository.EventRepository;
 
 import static ru.yandex.practicum.category.dto.CategoryMapper.toCategoryFromNewCategoryDto;
@@ -47,14 +48,20 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
     @Override
     public Category updateCategoryById(long catId, NewCategoryDto newCategoryDto) {
         Category category = repository.findById(catId).orElseThrow();
-        try {
-            category.setName(newCategoryDto.getName());
-            repository.save(category);
-        } catch (DataIntegrityViolationException e) {
-            throw new ConflictException("could not execute statement; SQL [n/a]; constraint [uq_category_name]; " +
-                    " nested exception is org.hibernate.exception.ConstraintViolationException: "
-                    + "could not execute statement");
+        System.out.println(newCategoryDto.getName().length());
+
+        if (newCategoryDto.getName().length() > 50) {
+            throw new IncorrectParameterException("---");
         }
+            try {
+                category.setName(newCategoryDto.getName());
+                repository.save(category);
+            } catch (DataIntegrityViolationException e) {
+                throw new ConflictException("could not execute statement; SQL [n/a]; constraint [uq_category_name]; " +
+                        " nested exception is org.hibernate.exception.ConstraintViolationException: "
+                        + "could not execute statement");
+            }
+
         return category;
     }
 
