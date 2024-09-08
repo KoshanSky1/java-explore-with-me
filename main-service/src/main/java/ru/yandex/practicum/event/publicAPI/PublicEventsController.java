@@ -15,7 +15,6 @@ import ru.yandex.practicum.event.dto.EventShortDto;
 import ru.yandex.practicum.event.model.search.SearchEventsArgs;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,12 +29,11 @@ public class PublicEventsController {
     private final PublicEventsService service;
 
     @GetMapping
-    public ResponseEntity<List<EventShortDto>> getEvents(//@RequestParam(required = false)
-                                                         //@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-                                                         //LocalDateTime rangeStart,
-                                                         @RequestParam(required = false) String rangeStart,
+    public ResponseEntity<List<EventShortDto>> getEvents(@RequestParam(required = false)
+                                                         @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                                         LocalDateTime rangeStart,
                                                          @RequestParam(required = false)
-                                                         //@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                                         @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
                                                          LocalDateTime rangeEnd,
                                                          @RequestParam(required = false) String text,
                                                          @RequestParam(required = false) List<Long> categories,
@@ -47,7 +45,8 @@ public class PublicEventsController {
                                                          HttpServletRequest request) {
 
         log.info("---START GET EVENTS ENDPOINT---");
-
+        //System.out.println(rangeStart);
+        //System.out.println(rangeEnd);
         //String str = rangeStart;
         //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         //LocalDateTime dateTime = LocalDateTime.parse(str, formatter);

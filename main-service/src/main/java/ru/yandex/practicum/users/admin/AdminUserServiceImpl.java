@@ -4,9 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.error.ConflictException;
+import ru.yandex.practicum.error.IncorrectParameterException;
 import ru.yandex.practicum.users.dto.NewUserRequest;
 import ru.yandex.practicum.users.model.User;
-import ru.yandex.practicum.error.ConflictException;
 import ru.yandex.practicum.users.repository.UserRepository;
 
 import java.util.List;
@@ -17,6 +18,7 @@ import static ru.yandex.practicum.users.dto.UserMapper.toUser;
 @RequiredArgsConstructor
 @Service
 public class AdminUserServiceImpl implements AdminUserService {
+
     private final UserRepository repository;
 
     @Override
@@ -31,6 +33,9 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Override
     public User postUser(NewUserRequest newUserRequest) {
         User user;
+        if (newUserRequest.getEmail().length() > 254) {
+            throw new IncorrectParameterException("email longer than 254 characters");
+        }
         try {
             user = repository.save(toUser(newUserRequest));
         } catch (DataIntegrityViolationException e) {
@@ -43,6 +48,8 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     @Override
     public void deleteUserById(int userId) {
+
         repository.deleteById((long) userId);
+
     }
 }

@@ -1,5 +1,6 @@
 package ru.yandex.practicum.event.privateAPI;
 
+import ru.yandex.practicum.event.dto.EventRequestStatusUpdateResult;
 import ru.yandex.practicum.event.dto.UpdateEventUserRequest;
 import ru.yandex.practicum.event.model.Event;
 import ru.yandex.practicum.event.dto.NewEventDto;
@@ -20,5 +21,5 @@ public interface PrivateEventsService {
 
     List<Request> getRequests(int userId, int eventId);
 
-    List<Request> updateRequests(int userId, int eventId, EventRequestStatusUpdateRequest request);
+    EventRequestStatusUpdateResult updateRequests(int userId, int eventId, EventRequestStatusUpdateRequest request);
 }

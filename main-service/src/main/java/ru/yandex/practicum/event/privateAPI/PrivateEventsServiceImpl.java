@@ -8,17 +8,15 @@ import ru.yandex.practicum.category.model.Category;
 import ru.yandex.practicum.category.repository.CategoryRepository;
 import ru.yandex.practicum.error.ConflictException;
 import ru.yandex.practicum.error.NotFoundException;
-import ru.yandex.practicum.event.dto.EventRequestStatusUpdateRequest;
-import ru.yandex.practicum.event.dto.NewEventDto;
-import ru.yandex.practicum.event.dto.UpdateEventAdminRequest;
-import ru.yandex.practicum.event.dto.UpdateEventUserRequest;
+import ru.yandex.practicum.event.dto.*;
 import ru.yandex.practicum.event.model.Event;
 import ru.yandex.practicum.event.model.Location;
 import ru.yandex.practicum.event.model.enums.EventState;
-import ru.yandex.practicum.event.model.enums.EventStatus;
 import ru.yandex.practicum.event.model.enums.StateAction;
 import ru.yandex.practicum.event.repository.EventRepository;
 import ru.yandex.practicum.event.repository.LocationRepository;
+import ru.yandex.practicum.request.dto.ParticipationRequestDto;
+import ru.yandex.practicum.request.dto.RequestMapper;
 import ru.yandex.practicum.request.model.Request;
 import ru.yandex.practicum.request.repository.RequestRepository;
 import ru.yandex.practicum.users.model.User;
@@ -26,8 +24,7 @@ import ru.yandex.practicum.users.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 import static ru.yandex.practicum.event.dto.EventMapper.toEventFromNewEventDto;
 import static ru.yandex.practicum.event.dto.EventMapper.toLocation;
@@ -37,6 +34,7 @@ import static ru.yandex.practicum.event.model.enums.EventStatus.*;
 @RequiredArgsConstructor
 @Service
 public class PrivateEventsServiceImpl implements PrivateEventsService {
+
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
@@ -45,7 +43,7 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
 
     @Override
     public List<Event> getEventsByUser(int userId) {
-       return eventRepository.findAllByInitiatorId(userId);
+        return eventRepository.findAllByInitiatorId(userId);
     }
 
     @Override
@@ -62,8 +60,6 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
             newEventDto.setRequestModeration(true);
         }
 
-        //System.out.println(newEventDto.getCategory());
-        //System.out.println(categoryRepository.findAll());
         Category category = categoryRepository.findById(Long.valueOf(newEventDto.getCategory())).orElseThrow();
 
         User user = userRepository.findById((long) userId).orElseThrow(()
@@ -90,9 +86,9 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
 
     @Override
     public Event updateEventById(int userId, int eventId, UpdateEventUserRequest updateEventUserRequest) {
-        // System.out.println(updateEventUserRequest);
         Event event = eventRepository.findById((long) eventId).orElseThrow(() -> new NotFoundException(
                 String.format("Event not found with id = %s and userId = %s", eventId, userId)));
+
         if (event.getInitiator().getId() != userId) {
             throw new NotFoundException(String.format("Event not found with id = %s and userId = %s", eventId, userId));
         }
@@ -104,90 +100,128 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
         }
 
         if (event.getState().equals(EventState.PUBLISHED)) {
-            System.out.println("hi");
             throw new ConflictException("Event must not be published");
         }
 
-        System.out.println(updateEventUserRequest.getStateAction());
-        if (StateAction.CANCEL_REVIEW.toString().equals(updateEventUserRequest.getStateAction().toString())) {
-            event.setState(EventState.CANCELED);
-        } else if (StateAction.SEND_TO_REVIEW.toString().equals(updateEventUserRequest.getStateAction().toString())) {
-            event.setState(EventState.PENDING);
+        if (updateEventUserRequest.getStateAction() != null) {
+            if (StateAction.CANCEL_REVIEW.toString().equals(updateEventUserRequest.getStateAction().toString())) {
+                event.setState(EventState.CANCELED);
+            } else if (StateAction.SEND_TO_REVIEW.toString().equals(updateEventUserRequest.getStateAction().toString())) {
+                event.setState(EventState.PENDING);
+            }
         }
-        System.out.println(event);
         return event;
     }
 
     @Override
     public List<Request> getRequests(int userId, int eventId) {
-        //System.out.println(eventId);
+
         List<Request> allRequests = requestRepository.findAll();
-        System.out.println(allRequests);
-        System.out.println(userId);
-        System.out.println(eventId);
         List<Request> requests = new ArrayList<>();
 
         for (Request r : allRequests) {
-            System.out.println(r.getEvent().getId());
-            System.out.println(r.getEvent().getInitiator().getId());
             if (r.getEvent().getId() == eventId && r.getEvent().getInitiator().getId() == userId) {
                 requests.add(r);
             }
         }
-        //s
-        //List<Request> requests = requestRepository.findAllByEventId(eventId);
-        //for (Request request : requests) {
-        //    if (request.getRequester().getId() != userId) {
-        //        requests.remove(request);
-        //    }
-        //}
+
         if (requests.isEmpty()) {
             throw new NotFoundException("Event not found with id = " + eventId + " and userId " + userId);
         }
+
         return requests;
     }
 
     @Override
-    public List<Request> updateRequests(int userId, int eventId,
-                                  EventRequestStatusUpdateRequest request) {
+    public EventRequestStatusUpdateResult updateRequests(int userId, int eventId,
+                                                         EventRequestStatusUpdateRequest request) {
+        String status = request.getStatus();
+        List<ParticipationRequestDto> confirmedRequests = new ArrayList<>();
+        List<ParticipationRequestDto> rejectedRequests = new ArrayList<>();
 
         List<Integer> requestIds = request.getRequestIds();
-        EventStatus status = getEventStatus(request.getStatus());
+        List<Request> requests = new ArrayList<>();
+        Request findRequest;
+
+        for (Integer i : requestIds) {
+            findRequest = requestRepository.findById(Long.valueOf(i)).orElseThrow();
+            requests.add(findRequest);
+        }
+
+        if (status.equals(REJECTED.toString())) {
+            if (status.equals(REJECTED.toString())) {
+                boolean isConfirmedRequestExists = requests.stream()
+                        .anyMatch(r -> r.getStatus().equals(CONFIRMED));
+                if (isConfirmedRequestExists) {
+                    throw new ConflictException("Cannot reject confirmed requests");
+                }
+                rejectedRequests = requests.stream()
+                        .peek(r -> r.setStatus(REJECTED))
+                        .map(RequestMapper::toParticipationRequestDto)
+                        .collect(Collectors.toList());
+                return new EventRequestStatusUpdateResult(confirmedRequests, rejectedRequests);
+            }
+        }
 
         Event event = eventRepository.findById((long) eventId).orElseThrow(() ->
                 new NotFoundException("Event not found with id = " + eventId + " and userId " + userId));
         if (event.getInitiator().getId() != userId) {
             throw new NotFoundException("Event not found with id = " + eventId + " and userId " + userId);
         }
-        if (event.getParticipantLimit() == 0 || !event.getRequestModeration()) {
-            return List.of();
+
+        Integer participantLimit = event.getParticipantLimit();
+        Integer approvedRequests = event.getConfirmedRequests();
+        if (approvedRequests == null) {
+            approvedRequests = 0;
         }
-        final int freeRequests;
-        if (event.getConfirmedRequests() == null) {
-            freeRequests = 0;
-            event.setConfirmedRequests(0);
-        } else {
-            freeRequests = event.getParticipantLimit() - event.getConfirmedRequests();
+        int availableParticipants = participantLimit - approvedRequests;
+        int potentialParticipants = requestIds.size();
+
+        if (participantLimit > 0 && participantLimit.equals(approvedRequests)) {
+            throw new ConflictException(String.format("Event with id=%d has reached participant limit", eventId));
         }
 
-        //if (freeRequests <= 0) {
-        //    throw new ConflictException(String.format("Event with id=%d has reached participant limit", eventId));
-        //}
-        List<Request> requests = requestRepository.findAllByIdInAndStatus(requestIds, PENDING);
-
-        AtomicInteger freeRequestsLeft = new AtomicInteger(freeRequests);
-        AtomicLong confirmedRequests = new AtomicLong(event.getConfirmedRequests());
-        requests.forEach(rq -> {
-            if (freeRequestsLeft.getAndDecrement() > 0) {
-                rq.setStatus(status);
-                confirmedRequests.incrementAndGet();
+        if (status.equals(CONFIRMED.toString())) {
+            if (potentialParticipants <= availableParticipants && !event.getRequestModeration()) {
+                confirmedRequests = requests.stream()
+                        .peek(r -> {
+                            if (!r.getStatus().equals(CONFIRMED)) {
+                                r.setStatus(CONFIRMED);
+                            } else {
+                                throw new ConflictException(String.format("Request with id=%d has already been confirmed", r.getId()));
+                            }
+                        })
+                        .map(RequestMapper::toParticipationRequestDto)
+                        .collect(Collectors.toList());
+                event.setConfirmedRequests(approvedRequests + potentialParticipants);
             } else {
-                rq.setStatus(REJECTED);
+                confirmedRequests = requests.stream()
+                        .limit(availableParticipants)
+                        .peek(r -> {
+                            if (!r.getStatus().equals(CONFIRMED)) {
+                                r.setStatus(CONFIRMED);
+                            } else {
+                                throw new ConflictException(String.format("Request with id=%d has already been confirmed", r.getId()));
+                            }
+                        })
+                        .map(RequestMapper::toParticipationRequestDto)
+                        .collect(Collectors.toList());
+                rejectedRequests = requests.stream()
+                        .skip(availableParticipants)
+                        .peek(r -> {
+                            if (!r.getStatus().equals(REJECTED)) {
+                                r.setStatus(REJECTED);
+                            } else {
+                                throw new ConflictException(String.format("Request with id=%d has already been rejected", r.getId()));
+                            }
+                        })
+                        .map(RequestMapper::toParticipationRequestDto)
+                        .collect(Collectors.toList());
+                event.setConfirmedRequests(participantLimit);
             }
-        });
-        event.setConfirmedRequests((int) confirmedRequests.get());
-
-        return requests;
+        }
+        eventRepository.save(event);
+        return new EventRequestStatusUpdateResult(confirmedRequests, rejectedRequests);
     }
 
 }

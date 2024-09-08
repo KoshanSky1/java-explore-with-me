@@ -8,9 +8,9 @@ import ru.yandex.practicum.event.model.Event;
 import ru.yandex.practicum.error.ConflictException;
 import ru.yandex.practicum.event.model.enums.EventState;
 import ru.yandex.practicum.event.model.enums.EventStateAction;
+import ru.yandex.practicum.event.model.search.SearchPublicEventsArgs;
 import ru.yandex.practicum.event.repository.EventRepository;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,23 +18,21 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class AdminEventsServiceImpl implements AdminEventsService {
-    private final EventRepository eventsRepository;
+
+    private final EventRepository eventRepository;
 
     @Override
-    public List<Event> getEvents(List<Long> users, List<String> states, List<Long> categories, LocalDateTime rangeStart,
-                                 LocalDateTime rangeEnd) {
+    public List<Event> getEvents(SearchPublicEventsArgs searchPublicEventsArgs) {
 
-        if (states == null) {
-            return eventsRepository.findEventsWithoutStates(users, categories, rangeStart, rangeEnd);
-        } else {
-            List<EventState> eventStates = findByState(states);
-            return eventsRepository.findEvents(users, eventStates, categories, rangeStart, rangeEnd);
-        }
+    return eventRepository.getEvents(
+            searchPublicEventsArgs.getUsers(), searchPublicEventsArgs.getStates(),
+            searchPublicEventsArgs.getCategories(), searchPublicEventsArgs.getRangeStart(),
+            searchPublicEventsArgs.getRangeEnd());
     }
 
     @Override
     public Event updateEventById(int eventId, UpdateEventAdminRequest updateEventAdminRequest) {
-        Event event = eventsRepository.findById((long) eventId).orElseThrow();
+        Event event = eventRepository.findById((long) eventId).orElseThrow();
 
         if (updateEventAdminRequest.getAnnotation() != null) {
             event.setAnnotation(updateEventAdminRequest.getAnnotation());
@@ -56,15 +54,17 @@ public class AdminEventsServiceImpl implements AdminEventsService {
         } else if (event.getState().equals(EventState.CANCELED)) {
             throw new ConflictException("Cannot publish the event because it's not in the right state: CANCELED");
         } else {
-            if (updateEventAdminRequest.getStateAction().toString().equals(EventStateAction.PUBLISH_EVENT.toString())) {
-                event.setState(EventState.PUBLISHED);
-            }
-            if (updateEventAdminRequest.getStateAction().toString().equals(EventStateAction.REJECT_EVENT.toString())) {
-                event.setState(EventState.CANCELED);
+            if (updateEventAdminRequest.getStateAction() != null) {
+                if (updateEventAdminRequest.getStateAction().toString().equals(EventStateAction.PUBLISH_EVENT.toString())) {
+                    event.setState(EventState.PUBLISHED);
+                }
+                if (updateEventAdminRequest.getStateAction().toString().equals(EventStateAction.REJECT_EVENT.toString())) {
+                    event.setState(EventState.CANCELED);
+                }
             }
         }
 
-        return eventsRepository.save(event);
+        return eventRepository.save(event);
     }
 
     public List<EventState> findByState(List<String> states) {

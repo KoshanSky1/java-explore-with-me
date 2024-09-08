@@ -9,8 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.users.dto.NewUserRequest;
-import ru.yandex.practicum.users.model.User;
 import ru.yandex.practicum.users.dto.UserDto;
+import ru.yandex.practicum.users.model.User;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,12 +23,14 @@ import static ru.yandex.practicum.users.dto.UserMapper.toUserDto;
 @RequiredArgsConstructor
 @RequestMapping(path = "/admin/users")
 public class AdminUsersController {
+
     private final AdminUserService service;
 
     @GetMapping
     public ResponseEntity<List<UserDto>> getUsers(@RequestParam(required = false) List<Long> ids,
                                                   @RequestParam(defaultValue = "0") @PositiveOrZero int from,
                                                   @RequestParam(defaultValue = "10") @Positive int size) {
+
         log.info("---START GET USERS ENDPOINT---");
 
         return new ResponseEntity<>(pagedResponse(service.getUsers(ids), from, size), HttpStatus.OK);
@@ -36,15 +38,17 @@ public class AdminUsersController {
 
     @PostMapping
     public ResponseEntity<UserDto> postUser(@RequestBody @Valid NewUserRequest newUserRequest) {
-        log.info("---START POST USER ENDPOINT---");
-        UserDto userDto = toUserDto(service.postUser(newUserRequest));
 
-        return new ResponseEntity<>(userDto, HttpStatus.CREATED);
+        log.info("---START POST USER ENDPOINT---");
+
+        return new ResponseEntity<>(toUserDto(service.postUser(newUserRequest)), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUserById(@PathVariable int userId) {
+
         log.info("---START DELETE USER BY ID ENDPOINT---");
+
         service.deleteUserById(userId);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -52,6 +56,7 @@ public class AdminUsersController {
 
     private List<UserDto> pagedResponse(List<User> users, int from, int size) {
         List<UserDto> pagedUsers = new ArrayList<>();
+
         int totalUsers = users.size();
         int toIndex = from + size;
 

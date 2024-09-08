@@ -22,6 +22,7 @@ import static ru.yandex.practicum.request.dto.RequestMapper.toRequest;
 @RequiredArgsConstructor
 @Service
 public class PrivateUsersServiceImpl implements PrivateUsersService {
+
     private final RequestRepository repository;
     private final EventRepository eventsRepository;
     private final UserRepository usersRepository;
@@ -37,6 +38,9 @@ public class PrivateUsersServiceImpl implements PrivateUsersService {
 
     @Override
     public Request postRequestsByUserId(int userId, int eventId) {
+
+        Request request;
+
         Event event = eventsRepository.findById((long) eventId).orElseThrow(()
                 -> new NotFoundException("Event not found with id = " + eventId));
 
@@ -49,8 +53,6 @@ public class PrivateUsersServiceImpl implements PrivateUsersService {
             throw new ConflictException("Request with requesterId= " +  userId + " and eventId" + eventId + " already exist");
         }
         if (event.getInitiator().getId() == userId) {
-            System.out.println(event.getInitiator().getId());
-            System.out.println(userId);
             throw new ConflictException(String.format("User with id=%d must not be equal to initiator", userId));
         }
         if (!event.getState().equals(EventState.PUBLISHED)) {
@@ -66,18 +68,26 @@ public class PrivateUsersServiceImpl implements PrivateUsersService {
             event.setConfirmedRequests(сonfirmedRequests + 1);
             event = eventsRepository.save(event);
         }
+            request = repository.save(toRequest(user, event));
 
-        return repository.save(toRequest(user, event));
+        if (event.getParticipantLimit() == 0) {
+            request.setStatus(EventStatus.CONFIRMED);
+        }
+
+        return repository.save(request);
     }
 
     @Override
     public Request updateRequestsByUserId(int userId, int requestId) {
         Request request = repository.findByIdAndRequesterId(requestId, userId);
+
         if (request == null) {
             throw new ConflictException("Request with id= " + requestId +
                     "and requesterId= " + userId + " was not found");
         }
+
         request.setStatus(EventStatus.CANCELED);
+
         return repository.save(request);
     }
 }

@@ -1,7 +1,6 @@
 package ru.yandex.practicum.request.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.yandex.practicum.event.model.enums.EventState;
 import ru.yandex.practicum.event.model.enums.EventStatus;
 import ru.yandex.practicum.request.model.Request;
 
@@ -17,5 +16,4 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
     List<Request> findAllByIdInAndStatus(List<Integer> requestIds, EventStatus status);
 
     boolean existsByRequesterIdAndEventId(int userId, int eventId);
-
 }

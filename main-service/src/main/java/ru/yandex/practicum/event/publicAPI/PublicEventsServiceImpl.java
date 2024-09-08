@@ -46,9 +46,9 @@ public class PublicEventsServiceImpl implements PublicEventsService {
         saveEndpointHit(args.getRequest());
 
         //System.out.println(args);
-       // if (args.getRangeEnd().isBefore(LocalDateTime.now())) {
-       //     throw new IncorrectParameterException("Field: category. Error: must not be blank. Value: null");
-       // }
+        //if (args.getRangeEnd().isBefore(LocalDateTime.now())) {
+        //    throw new IncorrectParameterException("Field: category. Error: must not be blank. Value: null");
+        //}
 
         return toListEventShortDtoFromSetEvents(eventsRepository.findAllWithArgs(pageable,
                 selectionCriteria).toSet());

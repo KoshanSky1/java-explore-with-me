@@ -18,6 +18,6 @@ public class SearchPublicEventsArgs {
     private LocalDateTime rangeStart;
     private LocalDateTime rangeEnd;
     private Boolean onlyAvailable;
-    private Integer from;
-    private Integer size;
+    //private Integer from;
+    //private Integer size;
 }

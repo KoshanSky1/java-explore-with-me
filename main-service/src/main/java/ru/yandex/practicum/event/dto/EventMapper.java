@@ -39,7 +39,6 @@ public class EventMapper {
 
     public static Event toEventFromNewEventDto(NewEventDto newEventDto, Category category, User initiator,
                                                Location location) {
-        //System.out.println("f"+category);
         return new Event(
                 null,
                 newEventDto.getAnnotation(),
@@ -51,7 +50,6 @@ public class EventMapper {
                 initiator,
                 location,
                 newEventDto.getPaid(),
-                //null,
                 newEventDto.getParticipantLimit(),
                 LocalDateTime.now(),
                 newEventDto.getRequestModeration(),
@@ -148,7 +146,7 @@ public class EventMapper {
     }
 
     public static EventRequestStatusUpdateResult toEventRequestStatusUpdateResult(List<ParticipationRequestDto> confirmedRequests,
-    List<ParticipationRequestDto> rejectedRequests) {
+                                                                                  List<ParticipationRequestDto> rejectedRequests) {
 
         return new EventRequestStatusUpdateResult(confirmedRequests, rejectedRequests);
     }
@@ -185,12 +183,5 @@ public class EventMapper {
         );
 
 
-
-}
-
-
-
-
-
-
+    }
 }

@@ -18,7 +18,6 @@ import java.util.Objects;
 public class PublicSelectionRepositoryImpl implements PublicSelectionRepository {
 
     private final EntityManager manager;
-
     private final CriteriaBuilder builder;
 
     public PublicSelectionRepositoryImpl(EntityManager entityManager) {

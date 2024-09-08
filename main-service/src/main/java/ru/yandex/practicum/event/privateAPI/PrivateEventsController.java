@@ -85,17 +85,8 @@ public class PrivateEventsController {
                                                                          eventRequestStatusUpdateRequest) {
         log.info("---START UPDATE REQUESTS ENDPOINT---");
 
-        List<Request> requests = service.updateRequests(userId, eventId, eventRequestStatusUpdateRequest);
-        List<ParticipationRequestDto> confirmedRequests = new ArrayList<>();
-        List<ParticipationRequestDto> rejectedRequests = new ArrayList<>();
-        for (Request request : requests) {
-            switch (request.getStatus()) {
-                case CONFIRMED -> confirmedRequests.add(toParticipationRequestDto(request));
-                case REJECTED -> rejectedRequests.add(toParticipationRequestDto(request));
-            }
-        }
-
-        return new ResponseEntity<>(toEventRequestStatusUpdateResult(confirmedRequests, rejectedRequests), HttpStatus.OK);
+        return new ResponseEntity<>(service.updateRequests(userId, eventId, eventRequestStatusUpdateRequest),
+                HttpStatus.OK);
     }
 
     private List<EventShortDto> pagedResponse(List<Event> events, int from, int size) {
