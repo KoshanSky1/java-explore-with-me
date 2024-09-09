@@ -50,7 +50,7 @@ public class PrivateUsersServiceImpl implements PrivateUsersService {
         User user = usersRepository.findById((long) userId).orElseThrow(()
                 -> new NotFoundException("User not found with id = " + userId));
 
-        Integer сonfirmedRequests = event.getConfirmedRequests();
+        Integer confirmedRequests = event.getConfirmedRequests();
 
         if (repository.existsByRequesterIdAndEventId(userId, eventId)) {
             throw new ConflictException("Request with requesterId= " + userId + " and eventId=" + eventId + " already exist");
@@ -65,10 +65,10 @@ public class PrivateUsersServiceImpl implements PrivateUsersService {
             throw new ConflictException("Event with id=" + eventId + " has reached participant limit");
         }
         if (!event.getRequestModeration()) {
-            if (сonfirmedRequests == null) {
-                сonfirmedRequests = 0;
+            if (confirmedRequests == null) {
+                confirmedRequests = 0;
             }
-            event.setConfirmedRequests(сonfirmedRequests + 1);
+            event.setConfirmedRequests(confirmedRequests + 1);
             event = eventsRepository.save(event);
         }
         request = repository.save(toRequest(user, event));
