@@ -31,7 +31,7 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public List<ViewStats> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
-        if (checkDate(start, end)) {
+        if (checkDate(start, end) || end.isBefore(start)) {
             throw new StatsValidationException("Даты начала и конца указаны неверно");
         }
         if (unique) {
