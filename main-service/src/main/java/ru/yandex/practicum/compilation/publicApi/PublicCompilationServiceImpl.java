@@ -13,10 +13,13 @@ import java.util.*;
 @RequiredArgsConstructor
 @Service
 public class PublicCompilationServiceImpl implements PublicCompilationService {
+
     private final CompilationRepository repository;
 
     @Override
     public List<Compilation> getCompilations(Boolean pinned) {
+        log.info("Сформирован список подборок с pinned= " + pinned);
+
         if (pinned != null) {
             return repository.findAllByPinned(pinned);
         } else {
@@ -26,6 +29,8 @@ public class PublicCompilationServiceImpl implements PublicCompilationService {
 
     @Override
     public Compilation getCompilationById(long compId) {
+        log.info("Поиск подборки с id=" + compId);
+
         return repository.findById(compId).orElseThrow(() -> new NotFoundException("Compilation not found with id = " +
                 compId));
     }

@@ -25,18 +25,23 @@ public class PublicCompilationController {
     public ResponseEntity<List<CompilationDto>> getCompilations(@RequestParam(required = false) Boolean pinned,
                                                                 @RequestParam(defaultValue = "0") int from,
                                                                 @RequestParam(defaultValue = "10") int size) {
+
         log.info("---START GET COMPILATIONS ENDPOINT---");
+
         return new ResponseEntity<>(pagedResponse(service.getCompilations(pinned), from, size), HttpStatus.OK);
     }
 
     @GetMapping("/{compId}")
     public ResponseEntity<CompilationDto> getCompilationById(@PathVariable int compId) {
+
         log.info("---START GET COMPILATION BY ID ENDPOINT---");
+
         return new ResponseEntity<>(toCompilationDto(service.getCompilationById(compId)), HttpStatus.OK);
     }
 
     private List<CompilationDto> pagedResponse(List<Compilation> compilations, int from, int size) {
         List<CompilationDto> pagedCompilations = new ArrayList<>();
+
         int totalCompilations = compilations.size();
         int toIndex = from + size;
 
@@ -52,5 +57,4 @@ public class PublicCompilationController {
             return Collections.emptyList();
         }
     }
-
 }

@@ -8,7 +8,6 @@ import ru.yandex.practicum.event.dto.EventRequestStatusUpdateRequest;
 import ru.yandex.practicum.request.model.Request;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface PrivateEventsService {
     List<Event> getEventsByUser(int userId);

@@ -30,7 +30,7 @@ public class ErrorHandler {
                 LocalDateTime.now().toString()
         );
     }
-//"Event with id=13 was not found"
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handleNotFoundException(ConflictException e) {

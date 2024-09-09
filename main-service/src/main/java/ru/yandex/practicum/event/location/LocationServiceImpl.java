@@ -3,7 +3,6 @@ package ru.yandex.practicum.event.location;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.event.location.LocationService;
 import ru.yandex.practicum.event.model.Location;
 import ru.yandex.practicum.event.repository.LocationRepository;
 
@@ -11,10 +10,13 @@ import ru.yandex.practicum.event.repository.LocationRepository;
 @RequiredArgsConstructor
 @Service
 public class LocationServiceImpl implements LocationService {
+
     private final LocationRepository repository;
 
     @Override
     public void saveLocation(Location location) {
+        log.info("Добавлена новая локация - широта: " + location.getLat() + ", долгота: " + location.getLon());
+
         repository.save(location);
     }
 }

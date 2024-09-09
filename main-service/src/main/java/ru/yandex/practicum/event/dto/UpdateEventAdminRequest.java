@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.yandex.practicum.event.model.enums.EventStateAction;
-import ru.yandex.practicum.event.model.Location;
 
 import java.time.LocalDateTime;
 

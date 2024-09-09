@@ -33,8 +33,7 @@ public class CompilationMapper {
     }
 
     public static Compilation toCompilationFromUpdateCompilationRequest(UpdateCompilationRequest
-                                                                        updateCompilationRequest,
-                                                                        List<Event> events) {
+                                                                        updateCompilationRequest, List<Event> events) {
         return new Compilation(
                 null,
                 updateCompilationRequest.getTitle(),

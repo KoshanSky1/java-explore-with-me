@@ -10,5 +10,4 @@ public interface PrivateUsersService {
     Request postRequestsByUserId(int userId, int eventId);
 
     Request updateRequestsByUserId(int userId, int requestId);
-
 }

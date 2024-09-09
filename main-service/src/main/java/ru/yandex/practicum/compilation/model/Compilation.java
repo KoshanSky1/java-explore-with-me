@@ -23,6 +23,5 @@ public class Compilation {
     @Column(name = "pinned")
     private boolean pinned;
     @ElementCollection
-   // @JoinColumn(name = "event_id")
     List<Event> events;
 }

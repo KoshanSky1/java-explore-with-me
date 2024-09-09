@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.compilation.repository.CompilationRepository;
 import ru.yandex.practicum.compilation.dto.NewCompilationDto;
 import ru.yandex.practicum.compilation.dto.UpdateCompilationRequest;
+import ru.yandex.practicum.error.NotFoundException;
 import ru.yandex.practicum.event.model.Event;
 import ru.yandex.practicum.compilation.model.Compilation;
 import ru.yandex.practicum.error.ConflictException;
@@ -21,46 +22,56 @@ import static ru.yandex.practicum.compilation.dto.CompilationMapper.toCompilatio
 @RequiredArgsConstructor
 @Service
 public class AdminCompilationServiceImpl implements AdminCompilationService {
+
     private final CompilationRepository repository;
     private final EventRepository eventRepository;
 
     @Override
     public Compilation postCompilation(NewCompilationDto newCompilationDto) {
-        //System.out.println(newCompilationDto);
+
         List<Event> events = new ArrayList<>();
         Set<Long> eventsIds = newCompilationDto.getEvents();
 
         if (newCompilationDto.getEvents() != null) {
             for (Long i : newCompilationDto.getEvents()) {
-                events.add(eventRepository.findById((i)).orElseThrow());
+                events.add(eventRepository.findById(i).orElseThrow(()
+                        -> new NotFoundException("Event not found with id=" + i)));
             }
         }
 
         Compilation compilation = toCompilationFromNewCompilationDto(newCompilationDto, events);
 
         try {
+            log.info("Добавлена новая подборка: " + compilation);
             return repository.save(compilation);
         } catch (ConflictException e) {
-            throw new ConflictException(",,,");
+            throw new ConflictException("could not execute statement; SQL [n/a]; constraint [uq_compilation_name];"
+                    + " nested exception is org.hibernate.exception.ConstraintViolationException:"
+                    + " could not execute statement");
         }
+
     }
 
     @Override
     public void deleteCompilation(int compId) {
-        System.out.println(repository.findById((long) compId));
+        log.info("Удалена подборка с id=" + compId);
+
         repository.deleteById((long) compId);
-        System.out.println(repository.findById((long) compId));
     }
 
     @Override
     public Compilation updateCompilationById(int compId, UpdateCompilationRequest updateCompilationRequest) {
-        Compilation compilation = repository.findById((long) compId).orElseThrow();
+        Compilation compilation = repository.findById((long) compId).orElseThrow(()
+                -> new NotFoundException("Compilation not found with id=" + compId));
+
         List<Event> events = new ArrayList<>();
         Set<Integer> eventsIds = updateCompilationRequest.getEvents();
 
         if (updateCompilationRequest.getEvents() != null) {
             for (Integer i : updateCompilationRequest.getEvents()) {
-                events.add(eventRepository.findById(Long.valueOf(i)).orElseThrow());
+                events.add(eventRepository.findById(Long.valueOf(i)).orElseThrow(()
+                        -> new NotFoundException("Event not found with id=" + i))
+                );
             }
         }
 
@@ -76,6 +87,9 @@ public class AdminCompilationServiceImpl implements AdminCompilationService {
             compilation.setTitle(updateCompilationRequest.getTitle());
         }
 
+        log.info("Обновлена с подборка id=" + compId);
+
         return repository.save(compilation);
     }
+
 }

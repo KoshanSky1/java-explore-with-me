@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.event.model.Event;
 import ru.yandex.practicum.event.dto.UpdateEventAdminRequest;
 import ru.yandex.practicum.event.dto.EventFullDto;
-import ru.yandex.practicum.event.model.enums.EventState;
 import ru.yandex.practicum.event.model.search.SearchPublicEventsArgs;
 
 import java.time.LocalDateTime;
@@ -27,36 +26,19 @@ import static ru.yandex.practicum.event.dto.EventMapper.toSearchPublicEventsArgs
 @RequiredArgsConstructor
 @RequestMapping(path = "/admin/events")
 public class AdminEventsController {
+
     private final AdminEventsService service;
 
     @GetMapping
     public ResponseEntity<List<EventFullDto>> getAll(@RequestParam(required = false)
-                                                     //@DateTimeFormat(pattern = TimeHelper.DATE_TIME_PATTERN)
                                                      LocalDateTime rangeStart,
                                                      @RequestParam(required = false)
-                                                     //@DateTimeFormat(pattern = TimeHelper.DATE_TIME_PATTERN)
                                                      LocalDateTime rangeEnd,
                                                      @RequestParam(required = false) List<Long> users,
                                                      @RequestParam(required = false) List<String> states,
                                                      @RequestParam(required = false) List<Long> categories,
                                                      @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
                                                      @RequestParam(defaultValue = "10") @Positive Integer size) {
-
-        /*System.out.println(rangeStart);
-        System.out.println(rangeEnd);
-        System.out.println(users);
-        System.out.println(states);
-        System.out.println(categories);
-        System.out.println(from);
-        System.out.println(size);*/
-
-            /*@RequestParam(required = false) List<Long> users,
-                                                     @RequestParam(required = false) List<String> states,
-                                                     @RequestParam(required = false) List<Long> categories,
-                                                     @RequestParam(required = false) LocalDateTime rangeStart,
-                                                     @RequestParam(required = false) LocalDateTime rangeEnd,
-                                                     @RequestParam(defaultValue = "0") @PositiveOrZero int from,
-                                                     @RequestParam(defaultValue = "10") @Positive int size) {*/
 
         log.info("---START GET EVENTS ENDPOINT---");
 
@@ -92,18 +74,6 @@ public class AdminEventsController {
         } else {
             return Collections.emptyList();
         }
-    }
-
-    public List<EventState> findByState(List<String> states) {
-        List<EventState> eventStates = new ArrayList<>();
-        for (String s : states) {
-            for (EventState state : EventState.values()) {
-                if (s.equalsIgnoreCase(state.name())) {
-                    eventStates.add(state);
-                }
-            }
-        }
-        return eventStates;
     }
 
 }

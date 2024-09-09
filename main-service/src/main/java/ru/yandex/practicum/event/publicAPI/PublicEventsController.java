@@ -9,7 +9,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.error.IncorrectParameterException;
 import ru.yandex.practicum.event.model.Event;
 import ru.yandex.practicum.event.dto.EventFullDto;
 import ru.yandex.practicum.event.model.search.SearchEventsArgs;
@@ -46,24 +45,23 @@ public class PublicEventsController {
 
         log.info("---START GET EVENTS ENDPOINT---");
 
-        if (rangeEnd != null && rangeEnd.isBefore(LocalDateTime.now())) {
-            throw new IncorrectParameterException("Cannot publish the event because it's not in the right state: CANCELED");
-        }
-
-        SearchEventsArgs args = toSearchEventsArgs(rangeStart, rangeEnd, text, categories,
-                paid, onlyAvailable, sort, request);
+        SearchEventsArgs args = toSearchEventsArgs(rangeStart, rangeEnd, text, categories, paid, onlyAvailable, sort,
+                request);
 
         return new ResponseEntity<>(pagedResponse(service.getEvents(args), from, size), HttpStatus.OK);
     }
 
     @GetMapping("/{eventId}")
     public ResponseEntity<EventFullDto> getEventById(@PathVariable int eventId, HttpServletRequest request) {
+
         log.info("---START GET EVENT BY ID ENDPOINT---");
+
         return new ResponseEntity<>(toEventFullDto(service.getEventById(eventId, request)), HttpStatus.OK);
     }
 
     private List<EventFullDto> pagedResponse(List<Event> events, int from, int size) {
         List<EventFullDto> pagedEvents = new ArrayList<>();
+
         int totalEvents = events.size();
         int toIndex = from + size;
 
@@ -79,5 +77,4 @@ public class PublicEventsController {
             return Collections.emptyList();
         }
     }
-
 }

@@ -43,6 +43,8 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
 
     @Override
     public List<Event> getEventsByUser(int userId) {
+        log.info("Сформирован список событий для пользователя с id= " + userId);
+
         return eventRepository.findAllByInitiatorId(userId);
     }
 
@@ -60,45 +62,50 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
             newEventDto.setRequestModeration(true);
         }
 
-        Category category = categoryRepository.findById(Long.valueOf(newEventDto.getCategory())).orElseThrow();
+        Category category = categoryRepository.findById(Long.valueOf(newEventDto.getCategory())).orElseThrow(()
+                -> new NotFoundException("Category with id=" + newEventDto.getCategory() + " was not found"));
 
         User user = userRepository.findById((long) userId).orElseThrow(()
-                -> new NotFoundException(String.format("User with id=%d was not found", userId)));
+                -> new NotFoundException("User with id=" + userId + " was not found"));
         Location location = locationRepository.save(toLocation(newEventDto.getLocation()));
-        event.setConfirmedRequests(0);
         try {
             event = eventRepository.save(toEventFromNewEventDto(newEventDto, category, user, location));
         } catch (DataIntegrityViolationException e) {
             throw new ConflictException("Field: category. Error: must not be blank. Value: null");
         }
+
+        log.info("Добавлено новое событие id=" + event.getId() + " для пользователя с id=" + userId);
+
         return event;
     }
 
     @Override
     public Event getEventById(int userId, int eventId) {
-        Event event = eventRepository.findById((long) eventId).orElseThrow(() -> new NotFoundException(
-                String.format("Event not found with id = %s and userId = %s", eventId, userId)));
+        log.info("Поиск события с id=" + eventId + " для пользователя с id=" + userId);
+
+        Event event = eventRepository.findById((long) eventId).orElseThrow(()
+                -> new NotFoundException("Event not found with id = " + eventId + " and userId = " + userId));
         if (event.getInitiator().getId() != userId) {
-            throw new NotFoundException(String.format("Event not found with id = %s and userId = %s", eventId, userId));
+            throw new NotFoundException("Event not found with id = " + eventId + " and userId = " + userId);
         }
+
         return event;
     }
 
     @Override
     public Event updateEventById(int userId, int eventId, UpdateEventUserRequest updateEventUserRequest) {
-        Event event = eventRepository.findById((long) eventId).orElseThrow(() -> new NotFoundException(
-                String.format("Event not found with id = %s and userId = %s", eventId, userId)));
 
+        Event event = eventRepository.findById((long) eventId).orElseThrow(()
+                -> new NotFoundException("Event not found with id = " + eventId + " and userId = " + userId));
         if (event.getInitiator().getId() != userId) {
-            throw new NotFoundException(String.format("Event not found with id = %s and userId = %s", eventId, userId));
+            throw new NotFoundException("Event not found with id = " + eventId + " and userId = " + userId);
         }
 
         if (updateEventUserRequest.getCategory() != null) {
             event.setCategory(categoryRepository.findById((long) updateEventUserRequest.getCategory())
-                    .orElseThrow(() -> new NotFoundException(String.format("Category with id=%d was not found",
-                            updateEventUserRequest.getCategory()))));
+                    .orElseThrow(() -> new NotFoundException("Category with id=" + updateEventUserRequest.getCategory()
+                            + "was not found")));
         }
-
         if (event.getState().equals(EventState.PUBLISHED)) {
             throw new ConflictException("Event must not be published");
         }
@@ -110,6 +117,8 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
                 event.setState(EventState.PENDING);
             }
         }
+        log.info("Обновлено событие с id=" + eventId + " для пользователя с id=" + userId);
+
         return event;
     }
 
@@ -126,8 +135,10 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
         }
 
         if (requests.isEmpty()) {
-            throw new NotFoundException("Event not found with id = " + eventId + " and userId " + userId);
+            throw new NotFoundException("Event not found with id=" + eventId + " and userId=" + userId);
         }
+
+        log.info("Сформирован список запросов к событию с id=" + eventId + " для пользователя с id=" + userId);
 
         return requests;
     }
@@ -135,6 +146,9 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
     @Override
     public EventRequestStatusUpdateResult updateRequests(int userId, int eventId,
                                                          EventRequestStatusUpdateRequest request) {
+
+        log.info("Обновление запросов для события с id=" + eventId + " для пользователя с id=" + userId);
+
         String status = request.getStatus();
         List<ParticipationRequestDto> confirmedRequests = new ArrayList<>();
         List<ParticipationRequestDto> rejectedRequests = new ArrayList<>();
@@ -171,6 +185,7 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
 
         Integer participantLimit = event.getParticipantLimit();
         Integer approvedRequests = event.getConfirmedRequests();
+
         if (approvedRequests == null) {
             approvedRequests = 0;
         }
@@ -178,7 +193,7 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
         int potentialParticipants = requestIds.size();
 
         if (participantLimit > 0 && participantLimit.equals(approvedRequests)) {
-            throw new ConflictException(String.format("Event with id=%d has reached participant limit", eventId));
+            throw new ConflictException("Event with id=" + event.getId() + " has reached participant limit");
         }
 
         if (status.equals(CONFIRMED.toString())) {
@@ -188,7 +203,7 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
                             if (!r.getStatus().equals(CONFIRMED)) {
                                 r.setStatus(CONFIRMED);
                             } else {
-                                throw new ConflictException(String.format("Request with id=%d has already been confirmed", r.getId()));
+                                throw new ConflictException("Request with id=" + r.getId() + " has already been confirmed");
                             }
                         })
                         .map(RequestMapper::toParticipationRequestDto)
@@ -201,7 +216,7 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
                             if (!r.getStatus().equals(CONFIRMED)) {
                                 r.setStatus(CONFIRMED);
                             } else {
-                                throw new ConflictException(String.format("Request with id=%d has already been confirmed", r.getId()));
+                                throw new ConflictException("Request with id=" + r.getId() + " has already been confirmed");
                             }
                         })
                         .map(RequestMapper::toParticipationRequestDto)
@@ -212,16 +227,16 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
                             if (!r.getStatus().equals(REJECTED)) {
                                 r.setStatus(REJECTED);
                             } else {
-                                throw new ConflictException(String.format("Request with id=%d has already been rejected", r.getId()));
+                                throw new ConflictException("Request with id=" + r.getId() + " has already been rejected");
                             }
                         })
                         .map(RequestMapper::toParticipationRequestDto)
                         .collect(Collectors.toList());
-                event.setConfirmedRequests(participantLimit);
+                event.setConfirmedRequests(event.getConfirmedRequests() + 1);
             }
         }
         eventRepository.save(event);
+
         return new EventRequestStatusUpdateResult(confirmedRequests, rejectedRequests);
     }
-
 }

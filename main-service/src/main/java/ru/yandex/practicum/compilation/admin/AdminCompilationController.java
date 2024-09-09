@@ -17,25 +17,34 @@ import static ru.yandex.practicum.compilation.dto.CompilationMapper.toCompilatio
 @RequiredArgsConstructor
 @RequestMapping(path = "/admin/compilations")
 public class AdminCompilationController {
+
     private final AdminCompilationService service;
 
     @PostMapping
     public ResponseEntity<CompilationDto> postCompilation(@RequestBody @Valid NewCompilationDto newCompilationDto) {
+
         log.info("---START POST COMPILATION ENDPOINT---");
+
         return new ResponseEntity<>(toCompilationDto(service.postCompilation(newCompilationDto)), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{compId}")
     public ResponseEntity<Void> deleteCompilation(@PathVariable int compId) {
+
         log.info("---START DELETE COMPILATION BY ID ENDPOINT---");
+
         service.deleteCompilation(compId);
+
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PatchMapping("/{compId}")
     public ResponseEntity<CompilationDto> updateCompilationById(@PathVariable int compId,
-                                                                @RequestBody @Valid UpdateCompilationRequest updateCompilationRequest) {
+                                                                @RequestBody @Valid UpdateCompilationRequest
+                                                                        updateCompilationRequest) {
+
         log.info("---START UPDATE COMPILATION BY ID ENDPOINT---");
+
         return new ResponseEntity<>(toCompilationDto(service.updateCompilationById(compId, updateCompilationRequest)),
                 HttpStatus.OK);
     }

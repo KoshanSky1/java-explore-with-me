@@ -6,14 +6,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.event.dto.UpdateEventAdminRequest;
 import ru.yandex.practicum.event.model.Event;
-//import ru.yandex.practicum.event.model.Event_;
 import ru.yandex.practicum.error.ConflictException;
 import ru.yandex.practicum.event.model.enums.EventState;
 import ru.yandex.practicum.event.model.enums.EventStateAction;
 import ru.yandex.practicum.event.model.search.SearchPublicEventsArgs;
 import ru.yandex.practicum.event.repository.EventRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -48,11 +46,15 @@ public class AdminEventsServiceImpl implements AdminEventsService {
             spec = spec.and((root, query, criteriaBuilder) ->
                     criteriaBuilder.lessThan(root.get("date"), searchPublicEventsArgs.getRangeEnd()));
         }
+
+        log.info("Сформирован список coбытий согласно спецификации");
+
         return eventRepository.findAll(spec);
     }
 
     @Override
     public Event updateEventById(int eventId, UpdateEventAdminRequest updateEventAdminRequest) {
+
         Event event = eventRepository.findById((long) eventId).orElseThrow();
 
         if (updateEventAdminRequest.getAnnotation() != null) {
@@ -84,20 +86,9 @@ public class AdminEventsServiceImpl implements AdminEventsService {
                 }
             }
         }
+        log.info("Обновлено событие с id= " + eventId);
 
         return eventRepository.save(event);
-    }
-
-    public List<EventState> findByState(List<String> states) {
-        List<EventState> eventStates = new ArrayList<>();
-        for (String s : states) {
-            for (EventState state : EventState.values()) {
-                if (s.equalsIgnoreCase(state.name())) {
-                    eventStates.add(state);
-                }
-            }
-        }
-        return eventStates;
     }
 
 }

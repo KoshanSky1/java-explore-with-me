@@ -13,16 +13,24 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class PublicCategoriesServiceImpl implements PublicCategoriesService {
+
     private final CategoryRepository repository;
 
     @Override
     public List<Category> getCategories() {
+
+        log.info("Сформирован список всех категорий");
+
         return repository.findAll();
     }
 
     @Override
     public Category getCategoryById(Long catId) {
+
+        log.info("Поиск категории с id= " + catId);
+
         return repository.findById(catId).orElseThrow(()
-                -> new NotFoundException("Category not found with id = " + catId));
+                -> new NotFoundException("Category with id=" + catId + " was not found"));
     }
+
 }

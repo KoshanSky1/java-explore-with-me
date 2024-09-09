@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static ru.yandex.practicum.event.dto.EventMapper.toEventRequestStatusUpdateResult;
 import static ru.yandex.practicum.request.dto.RequestMapper.toParticipationRequestDto;
 
 @Slf4j
@@ -24,57 +23,62 @@ import static ru.yandex.practicum.request.dto.RequestMapper.toParticipationReque
 @RequiredArgsConstructor
 @RequestMapping(path = "/users/{userId}/events")
 public class PrivateEventsController {
+
     private final PrivateEventsService service;
 
     @GetMapping
     public ResponseEntity<List<EventShortDto>> getEventsByUser(@PathVariable int userId,
                                                                @RequestParam(defaultValue = "0") int from,
                                                                @RequestParam(defaultValue = "10") int size) {
+
         log.info("---START GET EVENTS BY USER ENDPOINT---");
-        return new ResponseEntity<>(pagedResponse(service.getEventsByUser(userId), from, size),
-                HttpStatus.OK);
+
+        return new ResponseEntity<>(pagedResponse(service.getEventsByUser(userId), from, size), HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<EventFullDto> addEvent(@PathVariable int userId,
                                                  @RequestBody @Valid NewEventDto newEventDto) {
+
         log.info("---START ADD EVENT ENDPOINT---");
 
         EventFullDto eventFullDto = EventMapper.toEventFullDto(service.addEvent(userId, newEventDto));
-        //if (eventFullDto.getDescription().length() == 7000 || eventFullDto.getDescription().length() == 20
-        //        || eventFullDto.getAnnotation().length() == 20 || eventFullDto.getAnnotation().length() == 2000
-        //        || eventFullDto.getTitle().length() == 120 || eventFullDto.getTitle().length() == 3) {
-        //    return new ResponseEntity<>(eventFullDto, HttpStatus.CREATED);
-        //} else {
-            return new ResponseEntity<>(eventFullDto, HttpStatus.CREATED);
-       // }
+
+        return new ResponseEntity<>(eventFullDto, HttpStatus.CREATED);
     }
 
     @GetMapping("/{eventId}")
     public ResponseEntity<EventFullDto> getEventById(@PathVariable int userId, @PathVariable int eventId) {
+
         log.info("---START GET EVENT BY ID ENDPOINT---");
-        return new ResponseEntity<>(EventMapper.toEventFullDto(service.getEventById(userId, eventId)),
-                HttpStatus.OK);
+
+        return new ResponseEntity<>(EventMapper.toEventFullDto(service.getEventById(userId, eventId)), HttpStatus.OK);
     }
 
     @PatchMapping("/{eventId}")
     public ResponseEntity<EventFullDto> updateEventById(@PathVariable int userId,
                                                         @PathVariable int eventId,
                                                         @RequestBody @Valid UpdateEventUserRequest updateEventUserRequest) {
+
         log.info("---START UPDATE EVENT BY ID ENDPOINT---");
-        return new ResponseEntity<>(EventMapper.toEventFullDto(service.updateEventById(userId, eventId, updateEventUserRequest)),
-                HttpStatus.OK);
+
+        return new ResponseEntity<>(EventMapper.toEventFullDto(service.updateEventById(userId, eventId,
+                updateEventUserRequest)), HttpStatus.OK);
     }
 
     @GetMapping("/{eventId}/requests")
     public ResponseEntity<List<ParticipationRequestDto>> getRequests(@PathVariable int userId,
                                                                      @PathVariable int eventId) {
+
         log.info("---START GET REQUESTS ENDPOINT---");
+
         List<Request> requests = service.getRequests(userId, eventId);
         List<ParticipationRequestDto> participationRequestsDto = new ArrayList<>();
+
         for (Request request : requests) {
             participationRequestsDto.add(toParticipationRequestDto(request));
         }
+
         return new ResponseEntity<>(participationRequestsDto, HttpStatus.OK);
     }
 
@@ -83,6 +87,7 @@ public class PrivateEventsController {
                                                                          @PathVariable int eventId,
                                                                          @RequestBody EventRequestStatusUpdateRequest
                                                                          eventRequestStatusUpdateRequest) {
+
         log.info("---START UPDATE REQUESTS ENDPOINT---");
 
         return new ResponseEntity<>(service.updateRequests(userId, eventId, eventRequestStatusUpdateRequest),

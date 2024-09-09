@@ -23,6 +23,7 @@ public class PrivateUsersController {
 
     @GetMapping
     public ResponseEntity<List<ParticipationRequestDto>> getRequestsByUserId(@PathVariable int userId) {
+
         log.info("---START GET REQUESTS BY USER ID ENDPOINT---");
 
         List<ParticipationRequestDto> requestsDto = new ArrayList<>();
@@ -38,7 +39,9 @@ public class PrivateUsersController {
     @PostMapping
     public ResponseEntity<ParticipationRequestDto> postRequestsByUserId(@PathVariable int userId,
                                                                         @RequestParam int eventId) {
+
         log.info("---START POST REQUEST ENDPOINT---");
+
         return new ResponseEntity<>(toParticipationRequestDto(service.postRequestsByUserId(userId, eventId)),
                 HttpStatus.CREATED);
     }
@@ -46,7 +49,9 @@ public class PrivateUsersController {
     @PatchMapping("/{requestId}/cancel")
     public ResponseEntity<ParticipationRequestDto> updateRequestsByUserId(@PathVariable int userId,
                                                                           @PathVariable int requestId) {
+
         log.info("---START UPDATE REQUEST BY USER ID ENDPOINT---");
+
         return new ResponseEntity<>(toParticipationRequestDto(service.updateRequestsByUserId(userId, requestId)),
                 HttpStatus.OK);
     }

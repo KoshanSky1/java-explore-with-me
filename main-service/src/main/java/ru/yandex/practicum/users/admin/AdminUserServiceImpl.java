@@ -23,6 +23,8 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     @Override
     public List<User> getUsers(List<Long> ids) {
+        log.info("Сформирован список пользователей");
+
         if (ids == null) {
             return repository.findAll();
         } else {
@@ -34,7 +36,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     public User postUser(NewUserRequest newUserRequest) {
         User user;
         if (newUserRequest.getEmail().length() > 254) {
-            throw new IncorrectParameterException("email longer than 254 characters");
+            throw new IncorrectParameterException("Field: email. Error: must not be blank. Value: null");
         }
         try {
             user = repository.save(toUser(newUserRequest));
@@ -43,13 +45,15 @@ public class AdminUserServiceImpl implements AdminUserService {
                     + "nested exception is org.hibernate.exception.ConstraintViolationException: "
                     + "could not execute statement");
         }
+        log.info("Добавлен новый пользователь: " + user);
+
         return user;
     }
 
     @Override
     public void deleteUserById(int userId) {
+        log.info("Пользователь с id=" + userId + " удален");
 
         repository.deleteById((long) userId);
-
     }
 }

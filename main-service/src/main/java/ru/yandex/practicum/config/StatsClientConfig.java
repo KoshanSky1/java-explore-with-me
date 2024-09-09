@@ -1,4 +1,4 @@
-package ru.yandex.practicum.util;
+package ru.yandex.practicum.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;

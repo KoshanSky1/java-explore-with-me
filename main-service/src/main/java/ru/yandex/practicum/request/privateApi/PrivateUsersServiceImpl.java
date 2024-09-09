@@ -30,36 +30,39 @@ public class PrivateUsersServiceImpl implements PrivateUsersService {
     @Override
     public List<Request> getRequestsByUserId(int userId) {
         List<Request> requests = repository.findAllByRequesterId(userId);
+
         if (requests.isEmpty()) {
             throw new NotFoundException("User not found with id = " + userId);
         }
+
+        log.info("Получен список запросов для пользователя с id=" + userId);
+
         return requests;
     }
 
     @Override
     public Request postRequestsByUserId(int userId, int eventId) {
-
         Request request;
 
         Event event = eventsRepository.findById((long) eventId).orElseThrow(()
                 -> new NotFoundException("Event not found with id = " + eventId));
 
         User user = usersRepository.findById((long) userId).orElseThrow(()
-                -> new NotFoundException(String.format("User not found with id = " + userId)));
+                -> new NotFoundException("User not found with id = " + userId));
 
         Integer сonfirmedRequests = event.getConfirmedRequests();
 
         if (repository.existsByRequesterIdAndEventId(userId, eventId)) {
-            throw new ConflictException("Request with requesterId= " +  userId + " and eventId" + eventId + " already exist");
+            throw new ConflictException("Request with requesterId= " + userId + " and eventId=" + eventId + " already exist");
         }
         if (event.getInitiator().getId() == userId) {
-            throw new ConflictException(String.format("User with id=%d must not be equal to initiator", userId));
+            throw new ConflictException("User with id=" + userId + " must not be equal to initiator");
         }
         if (!event.getState().equals(EventState.PUBLISHED)) {
-            throw new ConflictException(String.format("Event with id=%d is not published", eventId));
+            throw new ConflictException("Event with id=" + eventId + " is not published");
         }
-        if (event.getParticipantLimit().equals(event.getConfirmedRequests())) {
-            throw new ConflictException(String.format("Event with id=%d has reached participant limit", eventId));
+        if (event.getParticipantLimit() != 0 && event.getParticipantLimit().equals(event.getConfirmedRequests())) {
+            throw new ConflictException("Event with id=" + eventId + " has reached participant limit");
         }
         if (!event.getRequestModeration()) {
             if (сonfirmedRequests == null) {
@@ -68,11 +71,12 @@ public class PrivateUsersServiceImpl implements PrivateUsersService {
             event.setConfirmedRequests(сonfirmedRequests + 1);
             event = eventsRepository.save(event);
         }
-            request = repository.save(toRequest(user, event));
+        request = repository.save(toRequest(user, event));
 
         if (event.getParticipantLimit() == 0) {
             request.setStatus(EventStatus.CONFIRMED);
         }
+        log.info("Добавлен запрос для пользователя с id=" + userId + " и события с id=" + eventId);
 
         return repository.save(request);
     }
@@ -82,9 +86,10 @@ public class PrivateUsersServiceImpl implements PrivateUsersService {
         Request request = repository.findByIdAndRequesterId(requestId, userId);
 
         if (request == null) {
-            throw new ConflictException("Request with id= " + requestId +
-                    "and requesterId= " + userId + " was not found");
+            throw new ConflictException("Request with id= " + requestId + " and requesterId= "
+                    + userId + " was not found");
         }
+        log.info("Обновлен запрос с id=" + requestId);
 
         request.setStatus(EventStatus.CANCELED);
 
