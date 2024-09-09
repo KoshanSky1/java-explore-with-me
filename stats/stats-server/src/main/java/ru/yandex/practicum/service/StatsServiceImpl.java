@@ -59,7 +59,7 @@ public class StatsServiceImpl implements StatsService {
 
     private Boolean checkDate(LocalDateTime start, LocalDateTime end) {
         return !end.isBefore(LocalDateTime.now()) && !start.isBefore(LocalDateTime.now()) && !end.equals(start)
-                && !start.isAfter(end);
+                && end.isAfter(start);
     }
 
 
