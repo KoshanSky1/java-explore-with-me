@@ -8,6 +8,7 @@ import ru.yandex.practicum.event.model.Event;
 import ru.yandex.practicum.event.model.Location;
 import ru.yandex.practicum.event.model.enums.EventState;
 import ru.yandex.practicum.event.model.search.SearchEventsArgs;
+import ru.yandex.practicum.event.model.search.SearchPublicEventsArgs;
 import ru.yandex.practicum.request.dto.ParticipationRequestDto;
 import ru.yandex.practicum.users.model.User;
 
@@ -62,13 +63,13 @@ public class EventMapper {
     public static EventFullDto toEventFullDto(Event event) {
         System.out.println(event.getAnnotation());
         return new EventFullDto(
-                event.getId(),
                 event.getAnnotation(),
                 toCategoryDto(event.getCategory()),
                 event.getConfirmedRequests(),
                 event.getCreatedOn(),
                 event.getDescription(),
                 event.getDate(),
+                event.getId(),
                 toUserShortDto(event.getInitiator()),
                 event.getLocation(),
                 event.getPaid(),
@@ -145,6 +146,16 @@ public class EventMapper {
         return eventsShortDto;
     }
 
+    public static List<EventFullDto> toListEventFullDtoFromSetEvents(Set<Event> events) {
+        List<EventFullDto> eventsFullDto = new ArrayList<>();
+
+        for (Event e : events) {
+            eventsFullDto.add(toEventFullDto(e));
+        }
+
+        return eventsFullDto;
+    }
+
     public static EventRequestStatusUpdateResult toEventRequestStatusUpdateResult(List<ParticipationRequestDto> confirmedRequests,
                                                                                   List<ParticipationRequestDto> rejectedRequests) {
 
@@ -168,7 +179,7 @@ public class EventMapper {
 
     public static SearchEventsArgs toSearchEventsArgs(LocalDateTime rangeStart, LocalDateTime rangeEnd, String text,
                                                       List<Long> categories, Boolean paid, Boolean onlyAvailable,
-                                                      String sort, int from, int size, HttpServletRequest request) {
+                                                      String sort, HttpServletRequest request) {
         return new SearchEventsArgs(
                 text,
                 categories,
@@ -177,11 +188,26 @@ public class EventMapper {
                 rangeEnd,
                 onlyAvailable,
                 sort,
-                from,
-                size,
+                //from,
+                //size,
                 request
         );
 
 
     }
+
+    public static SearchPublicEventsArgs toSearchPublicEventsArgs(List<Long> users, List<String> states,
+                                                                  List<Long> categories, LocalDateTime rangeStart,
+                                                                  LocalDateTime rangeEnd) {
+        return new SearchPublicEventsArgs(
+                users,
+                states,
+                categories,
+                rangeStart,
+                rangeEnd
+        );
+
+
+    }
+
 }

@@ -2,9 +2,11 @@ package ru.yandex.practicum.event.admin;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.event.dto.UpdateEventAdminRequest;
 import ru.yandex.practicum.event.model.Event;
+//import ru.yandex.practicum.event.model.Event_;
 import ru.yandex.practicum.error.ConflictException;
 import ru.yandex.practicum.event.model.enums.EventState;
 import ru.yandex.practicum.event.model.enums.EventStateAction;
@@ -24,10 +26,29 @@ public class AdminEventsServiceImpl implements AdminEventsService {
     @Override
     public List<Event> getEvents(SearchPublicEventsArgs searchPublicEventsArgs) {
 
-    return eventRepository.getEvents(
-            searchPublicEventsArgs.getUsers(), searchPublicEventsArgs.getStates(),
-            searchPublicEventsArgs.getCategories(), searchPublicEventsArgs.getRangeStart(),
-            searchPublicEventsArgs.getRangeEnd());
+        Specification<Event> spec = Specification.where((root, query, criteriaBuilder) -> null);
+
+        if (searchPublicEventsArgs.getUsers() != null) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    root.get("initiator").get("id").in(searchPublicEventsArgs.getUsers()));
+        }
+        if (searchPublicEventsArgs.getStates() != null) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    root.get("state").as(String.class).in(searchPublicEventsArgs.getStates()));
+        }
+        if (searchPublicEventsArgs.getCategories() != null) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    root.get("category").get("id").in(searchPublicEventsArgs.getCategories()));
+        }
+        if (searchPublicEventsArgs.getRangeStart() != null) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.greaterThan(root.get("date"), searchPublicEventsArgs.getRangeStart()));
+        }
+        if (searchPublicEventsArgs.getRangeEnd() != null) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.lessThan(root.get("date"), searchPublicEventsArgs.getRangeEnd()));
+        }
+        return eventRepository.findAll(spec);
     }
 
     @Override

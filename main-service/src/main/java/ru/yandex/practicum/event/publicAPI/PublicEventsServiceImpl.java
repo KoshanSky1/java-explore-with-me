@@ -4,11 +4,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.EndpointHitDto;
 import ru.yandex.practicum.error.ConflictException;
 import ru.yandex.practicum.error.IncorrectParameterException;
+import ru.yandex.practicum.event.dto.EventFullDto;
 import ru.yandex.practicum.event.dto.EventShortDto;
 import ru.yandex.practicum.event.model.Event;
 import ru.yandex.practicum.client.StatsClient;
@@ -22,15 +25,18 @@ import ru.yandex.practicum.util.CustomPageRequest;
 import ru.yandex.practicum.event.repository.PublicSelectionRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
+import static ru.yandex.practicum.event.dto.EventMapper.toListEventFullDtoFromSetEvents;
 import static ru.yandex.practicum.event.dto.EventMapper.toListEventShortDtoFromSetEvents;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class PublicEventsServiceImpl implements PublicEventsService {
-    //private final PublicSelectionRepositoryImpl selectionRepository;
+
     private final EventRepository eventsRepository;
     private final StatsClient client;
 
@@ -38,20 +44,65 @@ public class PublicEventsServiceImpl implements PublicEventsService {
     private String serviceName;
 
     @Override
-    public List<EventShortDto> getEvents(SearchEventsArgs args) {
+    public List<Event> getEvents(SearchEventsArgs args) {
 
-        CustomPageRequest pageable = createPagination(args.getSort(), args.getFrom(), args.getSize());
-        SelectionCriteria selectionCriteria = createCriteria(args);
+        Specification<Event> spec = Specification.where((root, query, criteriaBuilder) ->
+                criteriaBuilder.equal(root.get("state"), EventState.PUBLISHED));
+        //System.out.println(root.get("state");
 
+        if (args.getText() != null) {
+            String searchText = String.format("%%%s%%", args.getText());
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.or(
+                    criteriaBuilder.like(root.get("annotation"), searchText),
+                    criteriaBuilder.like(root.get("description"), searchText)
+            ));
+        }
+        if (args.getCategories() != null) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    root.get("category").get("id").in(args.getCategories()));
+            System.out.println(spec);
+        }
+        if (args.getPaid() != null) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.equal(root.get("paid"), args.getPaid()));
+            System.out.println(spec);
+        }
+        if (args.getRangeStart() != null) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.greaterThan(root.get("date"), args.getRangeStart()));
+            System.out.println(spec);
+        }
+        if (args.getRangeEnd() != null) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.lessThan(root.get("date"), args.getRangeEnd()));
+            System.out.println(spec);
+        }
+        if (args.getOnlyAvailable() != null) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.or(
+                            criteriaBuilder.equal(root.get("participantLimit"), 0),
+                            criteriaBuilder.lessThanOrEqualTo(
+                                    root.get("confirmedRequests"),
+                                    root.get("participantLimit").as(Long.class)
+                            )
+                    )
+            );
+        }
+
+        List<Event> events = eventsRepository.findAll(spec);
+
+        if (args.getSort() != null) {
+            switch (args.getSort()) {
+                case "EVENT_DATE":
+                    events.sort(Comparator.comparing(Event::getDate));
+                    break;
+                case "VIEWS":
+                    events.sort(Comparator.comparing(Event::getViews));
+                    break;
+            }
+        }
         saveEndpointHit(args.getRequest());
-
-        //System.out.println(args);
-        //if (args.getRangeEnd().isBefore(LocalDateTime.now())) {
-        //    throw new IncorrectParameterException("Field: category. Error: must not be blank. Value: null");
-        //}
-
-        return toListEventShortDtoFromSetEvents(eventsRepository.findAllWithArgs(pageable,
-                selectionCriteria).toSet());
+        return events;
     }
 
     @Override

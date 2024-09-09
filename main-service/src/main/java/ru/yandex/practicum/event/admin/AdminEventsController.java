@@ -5,7 +5,6 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static ru.yandex.practicum.event.dto.EventMapper.toEventFullDto;
+import static ru.yandex.practicum.event.dto.EventMapper.toSearchPublicEventsArgs;
 
 @Slf4j
 @RestController
@@ -29,39 +29,49 @@ import static ru.yandex.practicum.event.dto.EventMapper.toEventFullDto;
 public class AdminEventsController {
     private final AdminEventsService service;
 
-    public ResponseEntity<List<EventFullDto>> getAll(@RequestParam(required = false) List<Long> users,
+    @GetMapping
+    public ResponseEntity<List<EventFullDto>> getAll(@RequestParam(required = false)
+                                                     //@DateTimeFormat(pattern = TimeHelper.DATE_TIME_PATTERN)
+                                                     LocalDateTime rangeStart,
+                                                     @RequestParam(required = false)
+                                                     //@DateTimeFormat(pattern = TimeHelper.DATE_TIME_PATTERN)
+                                                     LocalDateTime rangeEnd,
+                                                     @RequestParam(required = false) List<Long> users,
+                                                     @RequestParam(required = false) List<String> states,
+                                                     @RequestParam(required = false) List<Long> categories,
+                                                     @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                                     @RequestParam(defaultValue = "10") @Positive Integer size) {
+
+        /*System.out.println(rangeStart);
+        System.out.println(rangeEnd);
+        System.out.println(users);
+        System.out.println(states);
+        System.out.println(categories);
+        System.out.println(from);
+        System.out.println(size);*/
+
+            /*@RequestParam(required = false) List<Long> users,
                                                      @RequestParam(required = false) List<String> states,
                                                      @RequestParam(required = false) List<Long> categories,
                                                      @RequestParam(required = false) LocalDateTime rangeStart,
                                                      @RequestParam(required = false) LocalDateTime rangeEnd,
                                                      @RequestParam(defaultValue = "0") @PositiveOrZero int from,
-                                                     @RequestParam(defaultValue = "10") @Positive int size) {
+                                                     @RequestParam(defaultValue = "10") @Positive int size) {*/
 
         log.info("---START GET EVENTS ENDPOINT---");
 
-        List<EventState> statesEnum = null;
-        if (states != null) {
-            List<EventState> eventStates = findByState(states);
-        }
+        SearchPublicEventsArgs args = toSearchPublicEventsArgs(users, states, categories, rangeStart, rangeEnd);
 
-        SearchPublicEventsArgs args = SearchPublicEventsArgs.builder()
-                .users(users)
-                .states(statesEnum)
-                .categories(categories)
-                .rangeStart(LocalDateTime.now())
-                .rangeEnd(LocalDateTime.now())
-                .build();
-
-        List<Event> events = service.getEvents(args);
-
-        return new ResponseEntity<>(pagedResponse(events, from, size), HttpStatus.OK);
+        return new ResponseEntity<>(pagedResponse(service.getEvents(args), from, size), HttpStatus.OK);
     }
 
     @PatchMapping("/{eventId}")
     public ResponseEntity<EventFullDto> updateEventById(@PathVariable int eventId,
                                                         @RequestBody @Valid UpdateEventAdminRequest
-                                                                updateEventAdminRequest) {
+                                                        updateEventAdminRequest) {
+
         log.info("---START UPDATE EVENT BY ID ENDPOINT---");
+
         return new ResponseEntity<>(toEventFullDto(service.updateEventById(eventId, updateEventAdminRequest)),
                 HttpStatus.OK);
     }

@@ -21,8 +21,8 @@ public class SearchEventsArgs {
     private LocalDateTime rangeEnd;
     private Boolean onlyAvailable;
     private String sort;
-    private Integer from;
-    private Integer size;
+    //private Integer from;
+    //rivate Integer size;
     private HttpServletRequest request;
 }
 

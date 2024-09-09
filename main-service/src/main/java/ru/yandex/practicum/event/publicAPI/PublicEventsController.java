@@ -9,9 +9,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.error.IncorrectParameterException;
 import ru.yandex.practicum.event.model.Event;
 import ru.yandex.practicum.event.dto.EventFullDto;
-import ru.yandex.practicum.event.dto.EventShortDto;
 import ru.yandex.practicum.event.model.search.SearchEventsArgs;
 
 import java.time.LocalDateTime;
@@ -29,44 +29,31 @@ public class PublicEventsController {
     private final PublicEventsService service;
 
     @GetMapping
-    public ResponseEntity<List<EventShortDto>> getEvents(@RequestParam(required = false)
-                                                         @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-                                                         LocalDateTime rangeStart,
-                                                         @RequestParam(required = false)
-                                                         @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-                                                         LocalDateTime rangeEnd,
-                                                         @RequestParam(required = false) String text,
-                                                         @RequestParam(required = false) List<Long> categories,
-                                                         @RequestParam(required = false) Boolean paid,
-                                                         @RequestParam(defaultValue = "false") Boolean onlyAvailable,
-                                                         @RequestParam(required = false) String sort,
-                                                         @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
-                                                         @RequestParam(defaultValue = "10") @Positive Integer size,
-                                                         HttpServletRequest request) {
+    public ResponseEntity<List<EventFullDto>> getEvents(@RequestParam(required = false)
+                                                        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                                        LocalDateTime rangeStart,
+                                                        @RequestParam(required = false)
+                                                        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                                        LocalDateTime rangeEnd,
+                                                        @RequestParam(required = false) String text,
+                                                        @RequestParam(required = false) List<Long> categories,
+                                                        @RequestParam(required = false) Boolean paid,
+                                                        @RequestParam(defaultValue = "false") Boolean onlyAvailable,
+                                                        @RequestParam(required = false) String sort,
+                                                        @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                                        @RequestParam(defaultValue = "10") @Positive Integer size,
+                                                        HttpServletRequest request) {
 
         log.info("---START GET EVENTS ENDPOINT---");
-        //System.out.println(rangeStart);
-        //System.out.println(rangeEnd);
-        //String str = rangeStart;
-        //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        //LocalDateTime dateTime = LocalDateTime.parse(str, formatter);
 
-        SearchEventsArgs args = toSearchEventsArgs(rangeEnd, rangeEnd, text, categories,
-                paid, onlyAvailable, sort, from, size, request);
+        if (rangeEnd != null && rangeEnd.isBefore(LocalDateTime.now())) {
+            throw new IncorrectParameterException("Cannot publish the event because it's not in the right state: CANCELED");
+        }
 
-        System.out.println(rangeStart);
-        System.out.println(rangeEnd);
-        System.out.println(text);
-        System.out.println(categories);
-        System.out.println(paid);
-        System.out.println(onlyAvailable);
-        System.out.println(sort);
-        System.out.println(from);
-        System.out.println(size);
+        SearchEventsArgs args = toSearchEventsArgs(rangeStart, rangeEnd, text, categories,
+                paid, onlyAvailable, sort, request);
 
-       /// for (service.)
-
-        return new ResponseEntity<>(service.getEvents(args), HttpStatus.OK);
+        return new ResponseEntity<>(pagedResponse(service.getEvents(args), from, size), HttpStatus.OK);
     }
 
     @GetMapping("/{eventId}")
@@ -75,8 +62,8 @@ public class PublicEventsController {
         return new ResponseEntity<>(toEventFullDto(service.getEventById(eventId, request)), HttpStatus.OK);
     }
 
-    private List<EventShortDto> pagedResponse(List<Event> events, int from, int size) {
-        List<EventShortDto> pagedEvents = new ArrayList<>();
+    private List<EventFullDto> pagedResponse(List<Event> events, int from, int size) {
+        List<EventFullDto> pagedEvents = new ArrayList<>();
         int totalEvents = events.size();
         int toIndex = from + size;
 
@@ -85,7 +72,7 @@ public class PublicEventsController {
                 toIndex = totalEvents;
             }
             for (Event event : events.subList(from, toIndex)) {
-                pagedEvents.add(toEventShortDto(event));
+                pagedEvents.add(toEventFullDto(event));
             }
             return pagedEvents;
         } else {
