@@ -80,8 +80,11 @@ public class PublicEventsServiceImpl implements PublicEventsService {
                 case "VIEWS":
                     events.sort(Comparator.comparing(Event::getViews));
                     break;
+                default:
+                    events.sort(Comparator.comparing(Event::getId));
             }
         }
+
         log.info("Сформирован список запросов согласно спецификации");
 
         saveEndpointHit(args.getRequest());

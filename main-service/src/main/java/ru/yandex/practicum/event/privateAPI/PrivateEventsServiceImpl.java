@@ -154,13 +154,7 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
         List<ParticipationRequestDto> rejectedRequests = new ArrayList<>();
 
         List<Integer> requestIds = request.getRequestIds();
-        List<Request> requests = new ArrayList<>();
-        Request findRequest;
-
-        for (Integer i : requestIds) {
-            findRequest = requestRepository.findById(Long.valueOf(i)).orElseThrow();
-            requests.add(findRequest);
-        }
+        List<Request> requests = requestRepository.findAllByIdIn(requestIds);
 
         if (status.equals(REJECTED.toString())) {
             if (status.equals(REJECTED.toString())) {

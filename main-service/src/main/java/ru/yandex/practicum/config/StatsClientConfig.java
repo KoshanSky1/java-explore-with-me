@@ -13,7 +13,7 @@ public class StatsClientConfig {
     private String url;
 
     @Bean
-    StatsClient statsClient() {
+    public StatsClient statsClient() {
         RestTemplateBuilder builder = new RestTemplateBuilder();
         return new StatsClient(url, builder);
     }

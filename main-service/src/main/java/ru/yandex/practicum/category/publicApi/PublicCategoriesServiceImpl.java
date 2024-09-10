@@ -29,8 +29,8 @@ public class PublicCategoriesServiceImpl implements PublicCategoriesService {
 
         log.info("Поиск категории с id= " + catId);
 
-        return repository.findById(catId).orElseThrow(()
-                -> new NotFoundException("Category with id=" + catId + " was not found"));
+        return repository.findById(catId).orElseThrow(() -> new NotFoundException("Category with id=" + catId
+                + " was not found"));
     }
 
 }

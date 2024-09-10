@@ -33,16 +33,14 @@ public class AdminCompilationServiceImpl implements AdminCompilationService {
         Set<Long> eventsIds = newCompilationDto.getEvents();
 
         if (newCompilationDto.getEvents() != null) {
-            for (Long i : newCompilationDto.getEvents()) {
-                events.add(eventRepository.findById(i).orElseThrow(()
-                        -> new NotFoundException("Event not found with id=" + i)));
-            }
+            events.addAll(eventRepository.findAllByIdIn(eventsIds));
         }
 
         Compilation compilation = toCompilationFromNewCompilationDto(newCompilationDto, events);
 
         try {
             log.info("Добавлена новая подборка: " + compilation);
+
             return repository.save(compilation);
         } catch (ConflictException e) {
             throw new ConflictException("could not execute statement; SQL [n/a]; constraint [uq_compilation_name];"
@@ -65,14 +63,10 @@ public class AdminCompilationServiceImpl implements AdminCompilationService {
                 -> new NotFoundException("Compilation not found with id=" + compId));
 
         List<Event> events = new ArrayList<>();
-        Set<Integer> eventsIds = updateCompilationRequest.getEvents();
+        Set<Long> eventsIds = updateCompilationRequest.getEvents();
 
         if (updateCompilationRequest.getEvents() != null) {
-            for (Integer i : updateCompilationRequest.getEvents()) {
-                events.add(eventRepository.findById(Long.valueOf(i)).orElseThrow(()
-                        -> new NotFoundException("Event not found with id=" + i))
-                );
-            }
+            events.addAll(eventRepository.findAllByIdIn(eventsIds));
         }
 
         if (!events.isEmpty()) {

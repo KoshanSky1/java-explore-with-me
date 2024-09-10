@@ -132,7 +132,6 @@ public class EventMapper {
     public static SearchPublicEventsArgs toSearchPublicEventsArgs(List<Long> users, List<String> states,
                                                                   List<Long> categories, LocalDateTime rangeStart,
                                                                   LocalDateTime rangeEnd) {
-
         return new SearchPublicEventsArgs(
                 users,
                 states,

@@ -23,5 +23,5 @@ public class Compilation {
     @Column(name = "pinned")
     private boolean pinned;
     @ElementCollection
-    List<Event> events;
+    private List<Event> events;
 }
