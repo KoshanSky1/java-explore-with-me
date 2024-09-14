@@ -49,7 +49,7 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
             repository.deleteById(catId);
         }
 
-        log.info("Категория " + category.getName() + " удалена");
+        log.info("Категория: " + category.getName() + " удалена");
     }
 
     @Override
