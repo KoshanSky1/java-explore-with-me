@@ -6,6 +6,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.error.ConflictException;
 import ru.yandex.practicum.error.IncorrectParameterException;
+import ru.yandex.practicum.error.NotFoundException;
 import ru.yandex.practicum.users.dto.NewUserRequest;
 import ru.yandex.practicum.users.model.User;
 import ru.yandex.practicum.users.repository.UserRepository;
@@ -56,4 +57,13 @@ public class AdminUserServiceImpl implements AdminUserService {
 
         repository.deleteById((long) userId);
     }
+
+    @Override
+    public User getUserById(int userId) {
+        log.info("Поиск пользователя с id=" + userId);
+
+        return repository.findById((long) userId).orElseThrow(()
+                -> new NotFoundException("User not found with id = " + userId));
+    }
+
 }

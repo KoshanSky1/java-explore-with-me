@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
-import ru.yandex.practicum.event.model.Location;
+import ru.yandex.practicum.event.location.Location;
 import ru.yandex.practicum.event.model.enums.StateAction;
 
 import java.time.LocalDateTime;

@@ -110,6 +110,16 @@ public class PublicEventsServiceImpl implements PublicEventsService {
         return event;
     }
 
+    @Override
+    public Event getEventByIdWithoutRequest(int eventId) {
+        Event event = eventsRepository.findById((long) eventId).orElseThrow(()
+                -> new NotFoundException("Event not found with id = " + eventId));
+
+        log.info("Найдено событие с id=" + eventId);
+
+        return event;
+    }
+
     private void saveEndpointHit(HttpServletRequest request) {
         EndpointHitDto eh = new EndpointHitDto(
                 null,

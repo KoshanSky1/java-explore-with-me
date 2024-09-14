@@ -3,8 +3,6 @@ package ru.yandex.practicum.event.location;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.event.model.Location;
-import ru.yandex.practicum.event.repository.LocationRepository;
 
 @Slf4j
 @RequiredArgsConstructor
