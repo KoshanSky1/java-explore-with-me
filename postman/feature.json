@@ -643,45 +643,6 @@
 			"name": "Get comments",
 			"item": [
 				{
-					"name": "Get comments for non-exists user",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Ответ должен содержать код статуса 409 и данные в формате json\", function () {\r",
-									"    pm.response.to.have.status(404);\r",
-									"    pm.response.to.be.withBody;\r",
-									"    pm.response.to.be.json;\r",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:8080/users/11/events/1/comment",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"users",
-								"11",
-								"events",
-								"1",
-								"comment"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Get comments for non-exists event",
 					"event": [
 						{
