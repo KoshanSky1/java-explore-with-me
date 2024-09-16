@@ -10,4 +10,6 @@ public interface PublicEventsService {
     List<Event> getEvents(SearchEventsArgs args);
 
     Event getEventById(int eventId, HttpServletRequest request);
+
+    Event getEventByIdWithoutRequest(int eventId);
 }

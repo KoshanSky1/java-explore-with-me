@@ -11,4 +11,6 @@ public interface AdminUserService {
     User postUser(NewUserRequest newUserRequest);
 
     void deleteUserById(int userId);
+
+    User getUserById(int userId);
 }

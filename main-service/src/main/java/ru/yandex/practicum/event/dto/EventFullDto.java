@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.yandex.practicum.category.dto.CategoryDto;
 import ru.yandex.practicum.event.model.enums.EventState;
-import ru.yandex.practicum.event.model.Location;
+import ru.yandex.practicum.event.location.Location;
 import ru.yandex.practicum.users.dto.UserShortDto;
 
 import java.time.LocalDateTime;

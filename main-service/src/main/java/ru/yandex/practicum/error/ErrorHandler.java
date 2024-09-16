@@ -35,7 +35,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handleNotFoundException(ConflictException e) {
         return new ApiError(
-                "NOT_FOUND",
+                "CONFLICT",
                 "The required object was not found.",
                 e.getMessage(),
                 LocalDateTime.now().toString()

@@ -1,7 +1,6 @@
-package ru.yandex.practicum.event.repository;
+package ru.yandex.practicum.event.location;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.yandex.practicum.event.model.Location;
 
 public interface LocationRepository extends JpaRepository<Location, Long> {
 

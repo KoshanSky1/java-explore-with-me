@@ -10,11 +10,11 @@ import ru.yandex.practicum.error.ConflictException;
 import ru.yandex.practicum.error.NotFoundException;
 import ru.yandex.practicum.event.dto.*;
 import ru.yandex.practicum.event.model.Event;
-import ru.yandex.practicum.event.model.Location;
+import ru.yandex.practicum.event.location.Location;
 import ru.yandex.practicum.event.model.enums.EventState;
 import ru.yandex.practicum.event.model.enums.StateAction;
 import ru.yandex.practicum.event.repository.EventRepository;
-import ru.yandex.practicum.event.repository.LocationRepository;
+import ru.yandex.practicum.event.location.LocationRepository;
 import ru.yandex.practicum.request.dto.ParticipationRequestDto;
 import ru.yandex.practicum.request.dto.RequestMapper;
 import ru.yandex.practicum.request.model.Request;
@@ -75,7 +75,7 @@ public class PrivateEventsServiceImpl implements PrivateEventsService {
         }
 
         log.info("Добавлено новое событие id=" + event.getId() + " для пользователя с id=" + userId);
-
+        System.out.println(event.getId());
         return event;
     }
 
